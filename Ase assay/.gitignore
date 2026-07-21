@@ -1,0 +1,6 @@
+.uniprot_cache/
+__pycache__/
+*.pyc
+*.fasta
+.venv/
+.DS_Store
