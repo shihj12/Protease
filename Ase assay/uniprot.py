@@ -27,23 +27,65 @@ _ACC_RE = _re.compile(
 def looks_like_accession(token: str) -> bool:
     return bool(_ACC_RE.match(token.strip().upper()))
 
-# UniProt feature "type" strings we care about (molecule processing).
+# Bump when the cached feature schema changes so stale caches are refreshed
+# (adds membrane/PTM feature kinds and per-feature evidence).
+SCHEMA_VERSION = 2
+
+# UniProt feature "type" strings we care about. Molecule processing drives the
+# activation-junction logic; the topology/PTM group provides "alternative
+# stability" context (transmembrane spans, disulfides, glycosylation).
 FEATURE_TYPES = {
+    # molecule processing
     "Signal": "SIGNAL",
     "Transit peptide": "TRANSIT",
     "Propeptide": "PROPEP",
     "Chain": "CHAIN",
     "Peptide": "PEPTIDE",
     "Initiator methionine": "INIT_MET",
+    # topology / membrane
+    "Transmembrane": "TRANSMEM",
+    "Intramembrane": "INTRAMEM",
+    "Topological domain": "TOPO_DOM",
+    # stability-relevant PTMs / bonds
+    "Disulfide bond": "DISULFID",
+    "Glycosylation": "CARBOHYD",
 }
+
+# ECO evidence codes -> (human label, confidence rank). Higher rank = stronger
+# evidence that the annotation (e.g. a propeptide boundary) is real rather than
+# predicted by homology. Used to flag which activation junctions are actually
+# experimentally supported.
+_ECO = {
+    "ECO:0000269": ("experimental", 3),
+    "ECO:0007744": ("experimental (combinatorial)", 3),
+    "ECO:0000305": ("curator inference", 2),
+    "ECO:0000303": ("author statement", 2),
+    "ECO:0000250": ("by similarity", 1),
+    "ECO:0000255": ("sequence model", 1),
+    "ECO:0000256": ("automatic annotation", 0),
+    "ECO:0000312": ("imported", 0),
+    "ECO:0000313": ("imported", 0),
+}
+
+
+def _summarise_evidence(evidences: list):
+    """Reduce a feature's evidence list to (label, rank); ('', -1) if none."""
+    best = ("", -1)
+    for ev in evidences or []:
+        label, rank = _ECO.get(ev.get("evidenceCode", ""), ("other", 0))
+        if rank > best[1]:
+            best = (label, rank)
+    return best
 
 
 @dataclass
 class Feature:
-    kind: str        # normalised: SIGNAL / TRANSIT / PROPEP / CHAIN / PEPTIDE / INIT_MET
+    kind: str        # normalised: SIGNAL / TRANSIT / PROPEP / CHAIN / PEPTIDE / ...
     start: int       # 1-based inclusive
     end: int         # 1-based inclusive
     description: str
+    evidence: str = ""       # human label for the strongest supporting evidence
+    evidence_rank: int = -1  # 3=experimental .. 0=automatic; -1=unstated
 
 
 @dataclass
@@ -94,16 +136,28 @@ def _parse(raw: dict) -> Entry:
             end = int(loc["end"]["value"])
         except (KeyError, TypeError, ValueError):
             continue  # skip features with unknown/fuzzy positions
-        features.append(Feature(kind, start, end, f.get("description", "")))
+        ev_label, ev_rank = _summarise_evidence(f.get("evidences", []))
+        features.append(Feature(kind, start, end, f.get("description", ""),
+                                ev_label, ev_rank))
     features.sort(key=lambda x: (x.start, x.end))
     return Entry(accession, name, protein, sequence, features, gene)
 
 
 def _entry_from_dict(d: dict) -> Entry:
-    feats = [Feature(**ff) for ff in d["features"]]
+    # Tolerate cache files that predate the evidence/topology fields.
+    feats = []
+    for ff in d["features"]:
+        feats.append(Feature(
+            ff["kind"], ff["start"], ff["end"], ff.get("description", ""),
+            ff.get("evidence", ""), ff.get("evidence_rank", -1)))
     # Older cache files predate the `gene` field; derive it from the entry name.
     gene = d.get("gene") or d.get("name", "").split("_")[0]
     return Entry(d["accession"], d["name"], d["protein"], d["sequence"], feats, gene)
+
+
+def _cache_is_current(d: dict) -> bool:
+    """A cache is current only if it was written with the present feature schema."""
+    return d.get("schema_version") == SCHEMA_VERSION
 
 
 def fetch(accession: str, use_cache: bool = True, timeout: int = 20) -> Entry:
@@ -114,9 +168,13 @@ def fetch(accession: str, use_cache: bool = True, timeout: int = 20) -> Entry:
 
     os.makedirs(CACHE_DIR, exist_ok=True)
     path = _cache_path(accession)
+    stale = None  # a cache in an older schema, kept as an offline fallback
     if use_cache and os.path.exists(path):
         with open(path, "r", encoding="utf-8") as fh:
-            return _entry_from_dict(json.load(fh))
+            cached = json.load(fh)
+        if _cache_is_current(cached):
+            return _entry_from_dict(cached)
+        stale = cached  # re-fetch to pick up evidence/topology; fall back if offline
 
     url = BASE_URL.format(acc=accession)
     req = urllib.request.Request(url, headers={"Accept": "application/json"})
@@ -124,8 +182,12 @@ def fetch(accession: str, use_cache: bool = True, timeout: int = 20) -> Entry:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             raw = json.loads(resp.read().decode("utf-8"))
     except urllib.error.HTTPError as e:
+        if stale is not None:
+            return _entry_from_dict(stale)
         raise ValueError(f"{accession}: HTTP {e.code} (check the accession)") from e
     except urllib.error.URLError as e:
+        if stale is not None:
+            return _entry_from_dict(stale)
         raise ValueError(f"{accession}: network error ({e.reason})") from e
 
     entry = _parse(raw)
@@ -135,6 +197,7 @@ def fetch(accession: str, use_cache: bool = True, timeout: int = 20) -> Entry:
     with open(path, "w", encoding="utf-8") as fh:
         json.dump(
             {
+                "schema_version": SCHEMA_VERSION,
                 "accession": entry.accession,
                 "name": entry.name,
                 "protein": entry.protein,

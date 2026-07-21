@@ -116,28 +116,34 @@ def is_cleavage_site(seq: str, protease: Protease, j: int) -> bool:
     return j in set(cleavage_sites(seq, protease))
 
 
-def digest(
-    seq: str,
-    protease: Protease | str,
-    missed_cleavages: int = 2,
-    min_len: int = 7,
-    max_len: int = 40,
-) -> list[Peptide]:
-    """Digest `seq`, returning peptides with up to `missed_cleavages` missed sites.
+def cleavage_sites_multi(seq: str, proteases) -> list[int]:
+    """Union of cut sites for several proteases used together (a co-digestion).
 
-    Peptides are filtered to [min_len, max_len]. Coordinates are 1-based inclusive.
+    Simultaneous/sequential digestion with two enzymes cuts wherever *either*
+    would — i.e. the union of their sites. `proteases` is an iterable of Protease
+    objects or names.
     """
-    if isinstance(protease, str):
-        protease = PROTEASES[protease]
-    seq = seq.upper()
+    s: set[int] = set()
+    for p in proteases:
+        if isinstance(p, str):
+            p = PROTEASES[p]
+        s.update(cleavage_sites(seq, p))
+    return sorted(s)
+
+
+def _peptides_from_sites(seq: str, sites: list[int], missed_cleavages: int,
+                         min_len: int, max_len: int) -> list[Peptide]:
+    """Generate peptides (with missed cleavages) from a sorted list of cut sites.
+
+    Shared by single- and multi-protease digestion. `missed_cleavages` counts
+    internal sites left uncut. Coordinates are 1-based inclusive.
+    """
     n = len(seq)
     if n == 0:
         return []
-
-    sites = cleavage_sites(seq, protease)
     # Boundaries between consecutive peptides, as 1-based end positions.
     # Fragment k spans (bounds[k]+1 .. bounds[k+1]) in 1-based coords.
-    bounds = [0] + sites + [n]
+    bounds = [0] + list(sites) + [n]
 
     peptides: list[Peptide] = []
     n_frag = len(bounds) - 1
@@ -153,6 +159,38 @@ def digest(
                 continue
             peptides.append(Peptide(start, end, seq[start - 1:end], mc))
     return peptides
+
+
+def digest(
+    seq: str,
+    protease: Protease | str,
+    missed_cleavages: int = 2,
+    min_len: int = 7,
+    max_len: int = 40,
+) -> list[Peptide]:
+    """Digest `seq`, returning peptides with up to `missed_cleavages` missed sites.
+
+    Peptides are filtered to [min_len, max_len]. Coordinates are 1-based inclusive.
+    """
+    if isinstance(protease, str):
+        protease = PROTEASES[protease]
+    seq = seq.upper()
+    return _peptides_from_sites(seq, cleavage_sites(seq, protease),
+                                missed_cleavages, min_len, max_len)
+
+
+def digest_multi(
+    seq: str,
+    proteases,
+    missed_cleavages: int = 2,
+    min_len: int = 7,
+    max_len: int = 40,
+) -> list[Peptide]:
+    """Co-digestion with several enzymes at once: peptides bounded by the union of
+    all enzymes' cut sites. Yields fragments neither enzyme produces alone."""
+    seq = seq.upper()
+    return _peptides_from_sites(seq, cleavage_sites_multi(seq, proteases),
+                                missed_cleavages, min_len, max_len)
 
 
 def protease_names() -> list[str]:

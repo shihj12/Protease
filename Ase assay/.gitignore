@@ -2,5 +2,7 @@
 __pycache__/
 *.pyc
 *.fasta
+.proteome_index.pkl
+.peptideatlas/
 .venv/
 .DS_Store

@@ -92,6 +92,7 @@ def _table_page(pdf, title, columns, rows, note="", max_rows=26, col_widths=None
 def build_pdf(entries, proteases, missed=2, min_len=7, max_len=35,
               cov_region="full", candidate_aa=None, prop_only=True) -> bytes:
     candidate_aa = candidate_aa or (["KR"] + analysis.LABELABLE_AA)
+    primary_label = tuple(candidate_aa[0]) if candidate_aa else ("K", "R")
     params = {
         "proteases": proteases, "missed": missed, "min_len": min_len,
         "max_len": max_len, "cov_region": cov_region, "prop_only": prop_only,
@@ -103,18 +104,21 @@ def build_pdf(entries, proteases, missed=2, min_len=7, max_len=35,
 
         # Protease scorecard.
         score = analysis.protease_scorecard(entries, proteases, missed, min_len,
-                                            max_len, prop_only)
+                                            max_len, prop_only, primary_label)
         if score and score[0]["total_junctions"]:
             tot = score[0]["total_junctions"]
             rows = [[s["protease"],
                      f"{s['diagnostic']}/{tot} ({s['pct_diagnostic']:.0f}%)",
+                     f"{s['actionable']}/{tot} ({s['pct_actionable']:.0f}%)",
                      s["ambiguous"], s["no_spanning_pep"], s["nterm_detectable"]]
                     for s in score]
             _table_page(
                 pdf, f"Protease scorecard — {len(entries)} proteins, {tot} junctions",
-                ["Protease", "Diagnostic", "Ambiguous", "No span", "N-term detect."],
-                rows, note="Diagnostic = a fully-specific peptide spans the junction "
-                           "(the protease can confirm activation).")
+                ["Protease", "Diagnostic", "Actionable", "Ambiguous", "No span",
+                 "N-term detect."],
+                rows, note="Diagnostic = a fully-specific peptide spans the junction. "
+                           "Actionable = also proteome-unique AND the protein has a "
+                           "constitutive normalizer peptide.")
 
         # SILAC label optimisation.
         best_rows, matrix = [], {}

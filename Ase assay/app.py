@@ -11,6 +11,8 @@ import pandas as pd
 import streamlit as st
 
 import analysis
+import peptideatlas
+import proteome
 import report
 import tracks
 import uniprot
@@ -66,6 +68,37 @@ cov_region = st.sidebar.radio(
     help="'chain' restricts % coverage to mature-chain residues only.",
 )
 
+# Primary SILAC label used for quantifiability / normalizer checks (first
+# candidate; the standard KR pair by default).
+primary_label = tuple(candidate_aa[0]) if candidate_aa else ("K", "R")
+
+st.sidebar.markdown("---")
+st.sidebar.caption("**Confidence filters**")
+require_unique = st.sidebar.checkbox(
+    "Require proteome-unique peptides", value=True,
+    help="Flag diagnostic/normalizer peptides that also occur in another human "
+         "protein (paralogues) — they can't specifically quantify this one.")
+require_observed = st.sidebar.checkbox(
+    "Require PeptideAtlas-observed normalizer", value=False,
+    help="Only count a normalizer if it appears in the loaded PeptideAtlas build.")
+
+# --- Data-source status (proteome FASTA + optional PeptideAtlas build) ---------
+st.sidebar.markdown("---")
+with st.sidebar.expander("Data sources", expanded=False):
+    if proteome.available():
+        ci = proteome.corpus_info()
+        st.caption(f"✓ Proteome uniqueness: {ci['n_proteins']:,} human proteins")
+    else:
+        st.caption("✗ No proteome FASTA found — uniqueness disabled. Add a "
+                   "human `*.fasta` next to app.py.")
+    if peptideatlas.available():
+        pi = peptideatlas.info()
+        st.caption(f"✓ PeptideAtlas: {pi['n_peptides']:,} observed peptides")
+    else:
+        st.caption("PeptideAtlas not loaded (optional). Drop a build file into a "
+                   "`.peptideatlas/` folder to enable observation checks. See "
+                   "peptideatlas.org/builds/.")
+
 # --- Fetch ---------------------------------------------------------------------
 
 if fetch:
@@ -107,8 +140,8 @@ prop_entries = [e for e in entries if any(
     j.is_propeptide for j in analysis.find_junctions(e))]
 noprop = [e for e in entries if e not in prop_entries]
 
-tab_tracks, tab_rank, tab_silac, tab_nterm, tab_feat = st.tabs(
-    ["Tracks", "Ranking", "SILAC", "N-terminomics", "Features"]
+tab_tracks, tab_rank, tab_conf, tab_silac, tab_nterm, tab_feat = st.tabs(
+    ["Tracks", "Ranking", "Confidence", "SILAC", "N-terminomics", "Features"]
 )
 
 # --- Tracks (primary) ----------------------------------------------------------
@@ -119,7 +152,7 @@ with tab_tracks:
 
     # Protease scorecard across the whole queried set.
     score = analysis.protease_scorecard(
-        entries, sel_proteases, missed, min_len, max_len, prop_only)
+        entries, sel_proteases, missed, min_len, max_len, prop_only, primary_label)
     if score and score[0]["total_junctions"]:
         tot = score[0]["total_junctions"]
         st.markdown(f"#### Protease scorecard — {len(entries)} proteins, "
@@ -128,11 +161,23 @@ with tab_tracks:
         sdf["diagnostic (of total)"] = sdf.apply(
             lambda r: f"{r['diagnostic']} / {r['total_junctions']} "
                       f"({r['pct_diagnostic']:.0f}%)", axis=1)
+        sdf["actionable (of total)"] = sdf.apply(
+            lambda r: f"{r['actionable']} / {r['total_junctions']} "
+                      f"({r['pct_actionable']:.0f}%)", axis=1)
         st.dataframe(
-            sdf[["protease", "diagnostic (of total)", "ambiguous",
-                 "no_spanning_pep", "nterm_detectable"]],
-            hide_index=True, width="stretch")
-        st.bar_chart(sdf.set_index("protease")["diagnostic"], height=200)
+            sdf[["protease", "diagnostic (of total)", "actionable (of total)",
+                 "ambiguous", "no_spanning_pep", "nterm_detectable"]],
+            hide_index=True, width="stretch",
+            column_config={"actionable (of total)": st.column_config.TextColumn(
+                "actionable (of total)",
+                help="Diagnostic AND the peptide is proteome-unique AND the protein "
+                     "has a constitutive normalizer peptide — i.e. actually usable.")})
+        st.bar_chart(sdf.set_index("protease")[["diagnostic", "actionable"]],
+                     height=200)
+        st.caption("**Actionable** = diagnostic peptide is proteome-unique *and* "
+                   "the protein has ≥1 constitutive normalizer peptide to anchor "
+                   "total abundance. A diagnostic peptide with no normalizer can't "
+                   "separate activation from expression change.")
         st.markdown("---")
 
     pool = prop_entries if prop_only else entries
@@ -191,6 +236,121 @@ with tab_rank:
                 "mature_term_peptide", "mature_term_len", "mature_term_detectable"]]
             .sort_values(["gene", "junction", "score"], ascending=[True, True, False]),
             hide_index=True, width="stretch")
+
+        # --- Double-digest rescue -------------------------------------------
+        st.markdown("---")
+        st.markdown("#### Double-digest rescue")
+        st.caption(
+            "Junctions where **no single enzyme** yields a usable peptide but a "
+            "**co-digestion (two enzymes together)** does — the extra cut sites "
+            "carve an over-long spanning peptide into the detectable window, or "
+            "shorten an undetectable mature neo-N-terminus into range.")
+        dd_all = st.checkbox("Show all pairs (not just improvements)", value=False,
+                             key="dd_all")
+        dd_rows = []
+        for e in entries:
+            dd_rows.extend(analysis.double_digest_search(
+                e, sel_proteases, missed, min_len, max_len, primary_label,
+                propeptide_only=only_pp, only_improving=not dd_all))
+        if not dd_rows:
+            st.info("No junction needs a double digest with the current proteases "
+                    "and length window — every rescuable junction is already "
+                    "covered by a single enzyme (or none can be rescued by a pair).")
+        else:
+            ddf = pd.DataFrame(dd_rows)
+            ddf["combo unique"] = ddf["combo_spanning_unique"].map(
+                {True: "✓", False: "✗ shared"}).fillna("—")
+            show = ddf[["gene", "junction", "side", "rescue", "single_best",
+                        "single_status", "combo", "combo_status",
+                        "combo_spanning_peptide", "combo_spanning_len", "combo unique"]]
+            st.dataframe(show.rename(columns={
+                "single_best": "best single", "single_status": "single result",
+                "combo": "enzyme pair", "combo_status": "pair result",
+                "combo_spanning_peptide": "pair peptide",
+                "combo_spanning_len": "len"}),
+                hide_index=True, width="stretch")
+
+# --- Confidence (uniqueness / observed / normalizer / evidence) ----------------
+
+with tab_conf:
+    st.markdown(
+        "**Is each diagnostic peptide actually usable?** A green bar in *Tracks* "
+        "only means a peptide spans the junction. For a real experiment it must "
+        "also be **proteome-unique** (not shared with a paralogue), ideally "
+        "**observed** in LC-MS (PeptideAtlas), and the protein needs a "
+        "**constitutive normalizer** peptide to anchor total abundance. The "
+        "junction annotation's **evidence** tells you whether the boundary itself "
+        "is experimentally proven or only inferred by similarity."
+    )
+    only_actionable = st.checkbox("Show only fully-actionable rows", value=False)
+
+    def _fmt_unique(u):
+        return "✓ unique" if u is True else ("✗ shared" if u is False else "?")
+
+    def _fmt_obs(o, applicable=True):
+        if not peptideatlas.available():
+            return "n/a (no build)"
+        if not applicable:
+            return "n/a (semi-tryptic)"
+        return str(o) if o else "not seen"
+
+    conf_rows = []
+    for e in entries:
+        norm_cache = {p: analysis.normalizer_summary(
+            e, p, missed, min_len, max_len, primary_label,
+            require_unique, require_observed) for p in sel_proteases}
+        for p in sel_proteases:
+            norm = norm_cache[p]
+            for d in analysis.junction_diagnostics(
+                    e, p, missed, min_len, max_len, primary_label):
+                if not d["is_propeptide_junction"]:
+                    continue
+                diag = d["status"].startswith("Diagnostic")
+                unique = d["spanning_unique"]
+                actionable = (diag and unique is not False
+                              and norm["has_normalizer"])
+                gaps = []
+                if not diag:
+                    gaps.append("not diagnostic")
+                if unique is False:
+                    gaps.append(f"shared with {', '.join(d['spanning_shared_with'][:3])}")
+                if not norm["has_normalizer"]:
+                    gaps.append("no normalizer")
+                if only_actionable and not actionable:
+                    continue
+                conf_rows.append({
+                    "gene": e.gene or e.name,
+                    "junction": d["junction"],
+                    "side": d["side"],
+                    "junction evidence": d["adj_evidence"] or "—",
+                    "protease": p,
+                    "diagnostic": "✓" if diag else "✗",
+                    "spanning peptide": d["spanning_peptide"] or "—",
+                    "unique": _fmt_unique(unique),
+                    "observed (PA)": _fmt_obs(d["spanning_observed"]),
+                    "GRAVY": d["spanning_gravy"],
+                    "flyer": d["spanning_flyer"] or "—",
+                    "mod-risk": ", ".join(d["spanning_mod_risks"]) or "—",
+                    "normalizers": norm["n_normalizers"],
+                    "best normalizer": norm["best_normalizer"] or "—",
+                    "actionable": "✅" if actionable else "—",
+                    "gaps": "; ".join(gaps),
+                })
+    if not conf_rows:
+        st.info("No propeptide-activation junctions in the current set "
+                "(or none pass the filter).")
+    else:
+        cdf = pd.DataFrame(conf_rows).sort_values(
+            ["gene", "junction", "actionable"], ascending=[True, True, False])
+        st.dataframe(cdf, hide_index=True, width="stretch")
+        st.caption("**unique** = maps to exactly one human protein (I/L collapsed). "
+                   "**observed (PA)** = PeptideAtlas observation count; semi-tryptic "
+                   "mature-terminus peptides are marked n/a because those builds are "
+                   "fully-tryptic. **mod-risk** = residues that split/shift the signal "
+                   "(Met-ox, N-term pyroGlu, N-glyco sequon, Cys, labile Asp-Pro). "
+                   "**junction evidence** = UniProt evidence for the propeptide "
+                   "boundary (experimental ▸ curator inference ▸ by similarity ▸ "
+                   "automatic).")
 
 # --- SILAC ---------------------------------------------------------------------
 
@@ -284,7 +444,8 @@ with tab_feat:
                      f"({e.length} aa)")
         feat_rows = [
             {"feature": f.kind, "start": f.start, "end": f.end,
-             "length": f.end - f.start + 1, "description": f.description}
+             "length": f.end - f.start + 1, "evidence": f.evidence or "—",
+             "description": f.description}
             for f in e.features
         ]
         if feat_rows:

@@ -23,7 +23,14 @@ FEATURE_COLORS = {
     "CHAIN": "#9ECAE1",
     "PEPTIDE": "#BAB0AC",
     "INIT_MET": "#D9D9D9",
+    "TRANSMEM": "#8C564B",   # membrane span
+    "INTRAMEM": "#C49C94",
+    "TOPO_DOM": "#EDE6DE",   # faint topology backdrop
+    "DISULFID": "#B279A2",   # bond marker
+    "CARBOHYD": "#54A24B",   # glycosylation marker
 }
+# Features drawn as point/short markers rather than proportional bars.
+_MARKER_FEATURES = {"DISULFID": "|", "CARBOHYD": "^"}
 COV_COLOR = "#94A3B8"       # coverage fill
 CUT_COLOR = "#334155"       # cut-site ticks
 DIAG_COLOR = "#2E7D32"      # diagnostic spanning peptide
@@ -82,16 +89,30 @@ def protein_track_figure(entry, protease_names, missed=2, min_len=7, max_len=35,
     # --- Features track (row 0) ---
     yf = y_of[0]
     ax.hlines(yf, 0, L, color="#CBD5E1", lw=1.0, zorder=1)  # backbone
-    # Draw chains (light) first, then signal/propep/transit on top.
-    order = {"CHAIN": 0, "PEPTIDE": 0, "SIGNAL": 1, "TRANSIT": 1, "PROPEP": 2}
+    # Draw topology backdrop first, then chains, then processing/membrane on top,
+    # then point markers (disulfide/glyco) last.
+    order = {"TOPO_DOM": -1, "CHAIN": 0, "PEPTIDE": 0, "SIGNAL": 1, "TRANSIT": 1,
+             "TRANSMEM": 2, "INTRAMEM": 2, "PROPEP": 3, "DISULFID": 4, "CARBOHYD": 4}
     for f in sorted(entry.features, key=lambda f: order.get(f.kind, 0)):
         color = FEATURE_COLORS.get(f.kind, "#999999")
+        if f.kind in _MARKER_FEATURES:  # disulfide / glycosylation: small glyph
+            ax.plot((f.start - 1 + f.end) / 2, yf + band * 1.35,
+                    marker=_MARKER_FEATURES[f.kind], color=color, markersize=4.5,
+                    markeredgewidth=0.8, zorder=6, clip_on=False)
+            continue
+        if f.kind == "TOPO_DOM":  # faint backdrop only
+            ax.add_patch(Rectangle((f.start - 1, yf - band * 0.9),
+                                   f.end - f.start + 1, band * 1.8, facecolor=color,
+                                   edgecolor="none", alpha=0.5, zorder=1))
+            continue
         h = band if f.kind in ("CHAIN", "PEPTIDE") else band * 1.5
+        hatch = "///" if f.kind in ("TRANSMEM", "INTRAMEM") else None
         ax.add_patch(Rectangle((f.start - 1, yf - h), f.end - f.start + 1, 2 * h,
-                               facecolor=color, edgecolor="none", zorder=2))
-        if f.kind in ("PROPEP", "SIGNAL") and (f.end - f.start + 1) > L * 0.02:
-            ax.text((f.start - 1 + f.end) / 2, yf + band * 1.7,
-                    "pro" if f.kind == "PROPEP" else "sig",
+                               facecolor=color, edgecolor="none", hatch=hatch,
+                               zorder=2))
+        if f.kind in ("PROPEP", "SIGNAL", "TRANSMEM") and (f.end - f.start + 1) > L * 0.02:
+            tag = {"PROPEP": "pro", "SIGNAL": "sig", "TRANSMEM": "TM"}[f.kind]
+            ax.text((f.start - 1 + f.end) / 2, yf + band * 1.7, tag,
                     ha="center", va="bottom", fontsize=7, color=color)
 
     # --- Protease tracks ---
@@ -139,10 +160,16 @@ def protein_track_figure(entry, protease_names, missed=2, min_len=7, max_len=35,
                 if d is None:
                     continue
                 if d["status"].startswith("Diagnostic"):
+                    # A non-unique peptide can't specifically quantify this protein;
+                    # a hydrophobic one may not fly. Flag both on the bar.
+                    non_unique = d.get("spanning_unique") is False
+                    risky_flyer = d.get("spanning_flyer") == "hydrophobic"
                     ax.add_patch(Rectangle(
                         (d["spanning_start"] - 1, yc - band), d["spanning_len"],
-                        2 * band, facecolor=DIAG_COLOR, edgecolor="white", lw=0.4,
-                        zorder=4))
+                        2 * band, facecolor=DIAG_COLOR,
+                        edgecolor=(AMBIG_COLOR if non_unique else "white"),
+                        lw=(1.6 if non_unique else 0.4),
+                        hatch=("xxx" if risky_flyer else None), zorder=4))
                 else:  # ambiguous: mark junction + show the ambiguous mature peptide
                     m_len = d["mature_term_len"]
                     m_start = jn.pos + 1 if jn.side == "N" else jn.pos - m_len + 1
@@ -172,6 +199,13 @@ def protein_track_figure(entry, protease_names, missed=2, min_len=7, max_len=35,
         Patch(facecolor=FEATURE_COLORS["CHAIN"], label="mature chain"),
         Patch(facecolor=COV_COLOR, alpha=0.45, label="coverage"),
     ]
+    has_tm = any(f.kind in ("TRANSMEM", "INTRAMEM") for f in entry.features)
+    if has_tm:
+        legend.append(Patch(facecolor=FEATURE_COLORS["TRANSMEM"], hatch="///",
+                            label="transmembrane"))
+    if any(f.kind == "CARBOHYD" for f in entry.features):
+        legend.append(Line2D([0], [0], marker="^", color=FEATURE_COLORS["CARBOHYD"],
+                            lw=0, label="glycosylation"))
     if mode == "nterm":
         legend += [
             Patch(facecolor=DIAG_COLOR, label="captured N-term peptide (detectable)"),
@@ -180,6 +214,9 @@ def protein_track_figure(entry, protease_names, missed=2, min_len=7, max_len=35,
     else:
         legend += [
             Patch(facecolor=DIAG_COLOR, label="diagnostic peptide"),
+            Patch(facecolor=DIAG_COLOR, edgecolor=AMBIG_COLOR, lw=1.6,
+                  label="not proteome-unique"),
+            Patch(facecolor=DIAG_COLOR, hatch="xxx", label="hydrophobic (poor flyer)"),
             Line2D([0], [0], color=AMBIG_COLOR, lw=2.2, label="ambiguous (cuts junction)"),
         ]
     legend.append(
