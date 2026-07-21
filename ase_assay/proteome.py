@@ -158,25 +158,36 @@ def corpus_info() -> dict:
     return {"path": _fasta_path, "n_proteins": len(_seqs)}
 
 
-def _candidate_indices(pep: str) -> set[int] | None:
+@functools.lru_cache(maxsize=300_000)
+def _seed_set(seed: str) -> frozenset:
+    """Proteins containing this 5-mer, as a frozenset. Cached because the same
+    seeds recur across millions of peptide queries (converting a large posting to
+    a set is the dominant cost of uniqueness checks)."""
+    idxs = _kmer_index.get(seed)
+    return frozenset(idxs) if idxs else frozenset()
+
+
+def _candidate_indices(pep: str):
     """Proteins that share every seed with the peptide are the only ones that can
     contain it. Returns None if the peptide is shorter than one k-mer (fall back
-    to a full scan)."""
+    to a full scan). Intersects rarest-seed-first for speed."""
     if len(pep) < _KMER:
         return None
-    seeds = [pep[j:j + _KMER] for j in range(0, len(pep) - _KMER + 1, _KMER)]
-    # Also include the trailing seed so the peptide's C-terminus is covered.
-    seeds.append(pep[len(pep) - _KMER:])
-    cand: set[int] | None = None
+    seeds = {pep[j:j + _KMER] for j in range(0, len(pep) - _KMER + 1, _KMER)}
+    seeds.add(pep[len(pep) - _KMER:])  # cover the C-terminus
+    sets = []
     for seed in seeds:
-        idxs = _kmer_index.get(seed)
-        if not idxs:
+        ss = _seed_set(seed)
+        if not ss:
             return set()  # a seed absent everywhere => peptide occurs nowhere
-        s = set(idxs)
-        cand = s if cand is None else (cand & s)
+        sets.append(ss)
+    sets.sort(key=len)          # start from the smallest posting
+    cand = sets[0]
+    for ss in sets[1:]:
+        cand = cand & ss
         if not cand:
             return set()
-    return cand or set()
+    return cand
 
 
 @functools.lru_cache(maxsize=100_000)
@@ -190,6 +201,39 @@ def _hits(pep: str) -> tuple:
             hit_accs.append(_accs[i])
             hit_genes.append(_genes[i])
     return tuple(hit_accs), tuple(hit_genes)
+
+
+def multiplicity(peptide: str, cap: int = 2) -> int:
+    """Number of proteins containing `peptide` as a substring, counted up to `cap`.
+
+    Fast path for uniqueness: if the peptide's k-mer seeds intersect to a single
+    protein, that protein is necessarily its source and no other protein can
+    contain it — so it is unique with NO substring verification. Only when several
+    proteins share every seed do we verify substrings (early-exiting at `cap`).
+    """
+    if not load():
+        return 0
+    pep = collapse(peptide)
+    if not pep:
+        return 0
+    cand = _candidate_indices(pep)
+    if cand is None:  # peptide shorter than one k-mer: fall back to a full scan
+        c = 0
+        for s in _seqs:
+            if pep in s:
+                c += 1
+                if c >= cap:
+                    return c
+        return c
+    if len(cand) <= 1:
+        return len(cand)  # only the source protein shares the seeds -> unique
+    c = 0
+    for i in cand:
+        if pep in _seqs[i]:
+            c += 1
+            if c >= cap:
+                return c
+    return c
 
 
 def protein_hits(peptide: str, limit: int = 6) -> dict:
@@ -214,8 +258,9 @@ def protein_hits(peptide: str, limit: int = 6) -> dict:
 
 
 def is_unique(peptide: str) -> bool | None:
-    """True/False if the corpus is loaded, else None (unknown — no FASTA)."""
-    info = protein_hits(peptide, limit=2)
-    if not info["available"]:
+    """True/False if the corpus is loaded, else None (unknown — no FASTA).
+
+    Uses the fast seed-intersection path (multiplicity with cap=2)."""
+    if not load():
         return None
-    return info["n_proteins"] == 1
+    return multiplicity(peptide, cap=2) == 1

@@ -11,6 +11,7 @@ import pandas as pd
 import streamlit as st
 
 import analysis
+import coverage_stats
 import peptideatlas
 import proteome
 import report
@@ -140,8 +141,10 @@ prop_entries = [e for e in entries if any(
     j.is_propeptide for j in analysis.find_junctions(e))]
 noprop = [e for e in entries if e not in prop_entries]
 
-tab_tracks, tab_rank, tab_conf, tab_silac, tab_nterm, tab_feat = st.tabs(
-    ["Tracks", "Ranking", "Confidence", "SILAC", "N-terminomics", "Features"]
+(tab_tracks, tab_rank, tab_conf, tab_silac, tab_nterm, tab_feat,
+ tab_proteome) = st.tabs(
+    ["Tracks", "Ranking", "Confidence", "SILAC", "N-terminomics", "Features",
+     "Proteome"]
 )
 
 # --- Tracks (primary) ----------------------------------------------------------
@@ -454,6 +457,100 @@ with tab_feat:
         else:
             st.write("No molecule-processing features annotated.")
         st.markdown("---")
+
+# --- Proteome-wide coverage ----------------------------------------------------
+
+with tab_proteome:
+    st.markdown(
+        "**Whole-proteome coverage for orthogonal digestions.** Each selected "
+        "enzyme is a **separate aliquot** (Trypsin in one, Glu-C in another…); a "
+        "protein counts if *any* aliquot delivers a qualifying peptide (union at "
+        "the protein level — not co-digestion). Numbers are shown for fully-cleaved "
+        "peptides (headline) and with missed cleavages (secondary), over the whole "
+        "human proteome and — side by side — your **queried proteins** as the "
+        "priority set."
+    )
+    if not coverage_stats.available():
+        st.warning("No proteome FASTA found next to app.py — this view needs the "
+                   "bundled human `*.fasta`.")
+    else:
+        aliquots = st.multiselect(
+            "Orthogonal aliquots (enzymes, each a separate digest)",
+            protease_names(), default=sel_proteases,
+            help="Union at the protein level. Order matters only for the "
+                 "orthogonality-gain table below.")
+        pa_label = st.text_input(
+            "SILAC label residues", value="".join(primary_label),
+            help="A peptide is 'quantifiable' if it contains any of these residues.")
+        plabel = tuple(c for c in pa_label.upper() if c.isalpha()) or ("K", "R")
+        st.caption(f"Using detectable length {min_len}–{max_len} aa and up to "
+                   f"{missed} missed cleavages from the sidebar. Priority set = the "
+                   f"{len(entries)} queried protein(s).")
+
+        run = st.button("Compute proteome statistics", type="primary")
+        if run and aliquots:
+            bar = st.progress(0.0, text="Digesting the proteome…")
+
+            def _cb(done, total):
+                bar.progress(done / total, text=f"Scanning proteins {done:,}/{total:,}")
+
+            summary = coverage_stats.proteome_summary(
+                aliquots, plabel, min_len, max_len, missed,
+                priority_accs=[e.accession for e in entries], progress=_cb)
+            bar.empty()
+            st.session_state["proteome_summary"] = summary
+        elif run:
+            st.warning("Select at least one aliquot enzyme.")
+
+        summary = st.session_state.get("proteome_summary")
+        if summary:
+            st.markdown(f"#### {' + '.join(summary['enzymes'])}  ·  label "
+                        f"{summary['label']}  ·  {summary['n_proteins']:,} proteins")
+
+            def _metric_rows(block):
+                h, m = block["0"], block["M"]
+                order = [("Coverage (%)", "coverage_pct"),
+                         ("Quantifiable (%)", "quant_pct"),
+                         ("Uniquely quantifiable (%)", "unique_pct"),
+                         ("Median seq. coverage (%)", "median_cov"),
+                         ("Hydrophobic peptides (%)", "hydrophobic_pct")]
+                return {lab: {"fully-cleaved": h[k], "+ missed": m[k]}
+                        for lab, k in order}
+
+            c1, c2 = st.columns(2)
+            with c1:
+                st.markdown("**Whole proteome**")
+                st.dataframe(pd.DataFrame(_metric_rows(summary["whole"])).T,
+                             width="stretch")
+            with c2:
+                st.markdown(f"**Priority set** ({summary['n_priority']} proteins)")
+                if summary["priority"]:
+                    st.dataframe(pd.DataFrame(_metric_rows(summary["priority"])).T,
+                                 width="stretch")
+                else:
+                    st.info("No queried proteins matched the proteome FASTA.")
+
+            st.markdown("#### Orthogonality gain")
+            st.caption("Uniquely-quantifiable coverage (fully-cleaved) as each "
+                       "aliquot is added — how much a second/third enzyme buys you.")
+            odf = pd.DataFrame(summary["orthogonality"])
+            cols = ["aliquots", "added", "whole_unique_pct"]
+            if odf["priority_unique_pct"].notna().any():
+                cols.append("priority_unique_pct")
+            st.dataframe(odf[cols].rename(columns={
+                "aliquots": "aliquot set", "added": "+ enzyme",
+                "whole_unique_pct": "whole uniquely-quant (%)",
+                "priority_unique_pct": "priority uniquely-quant (%)"}),
+                hide_index=True, width="stretch")
+            st.caption("Headline = fully-cleaved (0 missed) peptides only; "
+                       "**+ missed** allows up to the sidebar's missed-cleavage "
+                       "setting. 'Quantifiable' needs a label residue; 'uniquely "
+                       "quantifiable' also needs the peptide to be proteome-unique "
+                       "(substring, I/L collapsed).")
+        else:
+            st.info("Choose your aliquots and press **Compute proteome statistics**. "
+                    "First run builds a per-enzyme index (~20 s/enzyme) and caches "
+                    "it; later runs are instant.")
 
 # --- PDF export (sidebar) ------------------------------------------------------
 # Placed last so `prop_only` (defined in the Tracks tab) is available.

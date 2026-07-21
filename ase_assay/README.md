@@ -36,6 +36,13 @@ answer, before you run anything at the bench:
   that can carve a single enzyme's over-long spanning peptide into the detectable
   window, or shorten an undetectable neo-N-terminus — surfacing junctions that
   only a two-enzyme digest can capture.
+- **How good is my digest across the _whole_ proteome?** The **Proteome** tab
+  scores a set of **orthogonal aliquots** (e.g. Trypsin in one tube, Glu-C in
+  another) over all ~20k human proteins: % covered, % quantifiable with your SILAC
+  label, % *uniquely* quantifiable, median sequence coverage, and the hydrophobic
+  (poor-flyer) burden — with your queried proteins shown as a **priority set**
+  beside the global numbers, and an **orthogonality-gain** table showing how much
+  each added aliquot buys you.
 
 ## What counts as "diagnostic"
 
@@ -125,7 +132,10 @@ from the UniProt REST API and cached under `.uniprot_cache/` for offline reuse.
   per-peptide confidence (uniqueness, PeptideAtlas, GRAVY/detectability,
   modification risks).
 - `proteome.py` — indexes the bundled human FASTA for in-silico peptide
-  uniqueness (stdlib only; disk-cached k-mer index).
+  uniqueness (stdlib only; disk-cached k-mer index, seed-intersection fast path).
+- `coverage_stats.py` — whole-proteome coverage/quantifiability statistics for
+  orthogonal aliquots (union at the protein level), with a priority subset and
+  orthogonality gain; heavy scan cached to disk independent of the priority set.
 - `peptideatlas.py` — offline lookup of LC-MS-observed peptides from a downloaded
   PeptideAtlas build; self-disables if no build file is present.
 - `tracks.py` — the per-protein track figure (features + membrane topology + one
@@ -133,7 +143,22 @@ from the UniProt REST API and cached under `.uniprot_cache/` for offline reuse.
 - `presets.py` — curated gene lists (lysosomal hydrolases, proteasome subunits).
 - `report.py` — multi-page PDF report (matplotlib PdfPages, no extra deps).
 - `app.py` — Streamlit UI (Tracks / Ranking / Confidence / SILAC / N-terminomics
-  / Features).
+  / Features / Proteome).
+
+## Orthogonal vs. co-digestion
+
+Two different multi-enzyme ideas, kept separate:
+
+- **Co-digestion** (Ranking → *Double-digest rescue*): both enzymes in **one
+  tube**, so the cut sites are the *union* and you get new hybrid peptides. Useful
+  to rescue a single junction.
+- **Orthogonal digestion** (Proteome tab): each enzyme in a **separate aliquot**,
+  measured independently; a protein counts if *any* aliquot delivers a qualifying
+  peptide (union at the protein level). This is how you buy proteome-wide coverage.
+
+The first Proteome computation scans all ~20k proteins (~20 s per enzyme) and
+caches the result to `.coverage_cache/`; changing the priority set or SILAC label
+re-aggregates instantly without re-scanning.
 
 ## Notes / assumptions
 

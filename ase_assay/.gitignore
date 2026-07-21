@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 *.fasta
 .proteome_index.pkl
+.coverage_cache/
 .peptideatlas/
 .venv/
 .DS_Store
