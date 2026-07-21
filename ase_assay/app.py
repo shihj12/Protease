@@ -483,6 +483,27 @@ with tab_proteome:
             "SILAC label residues", value="".join(primary_label),
             help="A peptide is 'quantifiable' if it contains any of these residues.")
         plabel = tuple(c for c in pa_label.upper() if c.isalpha()) or ("K", "R")
+
+        atlas_ok = peptideatlas.available()
+        observed_gate = st.checkbox(
+            "Realistic mode — require PeptideAtlas-observed peptides",
+            value=False, disabled=not atlas_ok,
+            help="Only count peptides a mass spectrometer has actually seen. This "
+                 "collapses the theoretical ceiling toward reality (it folds in "
+                 "flyability and practical abundance).")
+        if not atlas_ok:
+            st.caption("⚠️ Realistic mode needs a PeptideAtlas build — drop one into "
+                       "`.peptideatlas/` (see peptideatlas.org/builds). Without it, "
+                       "numbers are the **theoretical ceiling** (a labelable peptide "
+                       "merely *exists*), which massively overstates real coverage.")
+        elif observed_gate:
+            tryptic = {"Trypsin", "Trypsin/P", "Lys-C"}
+            non_tryptic = [a for a in aliquots if a not in tryptic]
+            if non_tryptic:
+                st.caption("⚠️ PeptideAtlas builds are essentially fully-tryptic, so "
+                           f"observed counts for {', '.join(non_tryptic)} will be "
+                           "near-zero — the gate is only meaningful for tryptic "
+                           "aliquots (Trypsin / Lys-C).")
         st.caption(f"Using detectable length {min_len}–{max_len} aa and up to "
                    f"{missed} missed cleavages from the sidebar. Priority set = the "
                    f"{len(entries)} queried protein(s).")
@@ -496,7 +517,8 @@ with tab_proteome:
 
             summary = coverage_stats.proteome_summary(
                 aliquots, plabel, min_len, max_len, missed,
-                priority_accs=[e.accession for e in entries], progress=_cb)
+                priority_accs=[e.accession for e in entries],
+                require_observed=observed_gate, progress=_cb)
             bar.empty()
             st.session_state["proteome_summary"] = summary
         elif run:
@@ -504,8 +526,15 @@ with tab_proteome:
 
         summary = st.session_state.get("proteome_summary")
         if summary:
+            mode = ("empirical (PeptideAtlas-observed)" if summary.get("observed_gate")
+                    else "theoretical ceiling")
             st.markdown(f"#### {' + '.join(summary['enzymes'])}  ·  label "
                         f"{summary['label']}  ·  {summary['n_proteins']:,} proteins")
+            st.caption(f"Mode: **{mode}**. " + (
+                "These are peptides actually seen by LC-MS." if summary.get("observed_gate")
+                else "A labelable peptide merely *exists* — an upper bound, not a "
+                     "prediction. Enable *Realistic mode* (needs a PeptideAtlas build) "
+                     "for an empirically grounded estimate."))
 
             def _metric_rows(block):
                 h, m = block["0"], block["M"]

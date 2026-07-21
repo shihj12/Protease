@@ -28,6 +28,7 @@ import os
 import pickle
 import re
 
+import peptideatlas
 import proteases
 import proteome
 
@@ -127,24 +128,38 @@ def _finalise(acc, n):
     }
 
 
-def _scan_key(order, label_residues, min_len, max_len, missed):
+def _atlas_id(require_observed):
+    """Identity of the loaded PeptideAtlas build, so the scan cache invalidates if
+    the build changes. Empty when the observed gate is off."""
+    if not require_observed:
+        return ""
+    info = peptideatlas.info()
+    return f"{os.path.basename(info['source'] or '')}:{info['n_peptides']}"
+
+
+def _scan_key(order, label_residues, min_len, max_len, missed, require_observed):
     payload = repr([
         _CACHE_VERSION, list(order), sorted(r.upper() for r in label_residues),
-        min_len, max_len, missed,
+        min_len, max_len, missed, bool(require_observed),
+        _atlas_id(require_observed),
     ])
     return hashlib.md5(payload.encode()).hexdigest()[:16]
 
 
-def _scan(order, label_residues, min_len, max_len, missed, progress=None,
-          use_cache=True):
+def _scan(order, label_residues, min_len, max_len, missed, require_observed=False,
+          progress=None, use_cache=True):
     """Per-protein records for one aliquot set — the heavy pass, cached to disk.
 
     Independent of any priority set, so changing your queried proteins does NOT
     force a recompute. Each record is:
         (accession, level0_tuple, levelM_tuple, per_enzyme_unique0)
     where each level tuple is (detect, quant, unique, cov_pct, quant_pep, hyd_pep).
+
+    `require_observed` restricts every tier to peptides present in the loaded
+    PeptideAtlas build — an empirical realism filter (a peptide only counts if a
+    mass spectrometer has actually seen it).
     """
-    key = _scan_key(order, label_residues, min_len, max_len, missed)
+    key = _scan_key(order, label_residues, min_len, max_len, missed, require_observed)
     path = os.path.join(_CACHE_DIR, f"scan_{key}.pkl")
     if use_cache and os.path.exists(path):
         try:
@@ -155,6 +170,8 @@ def _scan(order, label_residues, min_len, max_len, missed, progress=None,
 
     corpus = _load_original()
     proteome.load()  # ensure the uniqueness index is ready
+    if require_observed:
+        peptideatlas.load()
     n = len(corpus)
     label_set = frozenset(r.upper() for r in label_residues)
     records = []
@@ -171,6 +188,10 @@ def _scan(order, label_residues, min_len, max_len, missed, progress=None,
             for ei, peps in enumerate(peps_by_enz):
                 for p in peps:
                     if level == "0" and p.missed != 0:
+                        continue
+                    # Empirical realism gate: only count peptides actually observed
+                    # by LC-MS (present in the loaded PeptideAtlas build).
+                    if require_observed and peptideatlas.observations(p.seq) is None:
                         continue
                     detect = True
                     covered[p.start - 1:p.end] = b"\x01" * (p.end - p.start + 1)
@@ -229,16 +250,17 @@ def _cumulative_unique(records, n_enz):
 
 
 def proteome_summary(enzyme_names, label_residues=("K", "R"), min_len=7, max_len=40,
-                     missed=2, priority_accs=None, progress=None, use_cache=True):
+                     missed=2, priority_accs=None, require_observed=False,
+                     progress=None, use_cache=True):
     """Whole-proteome (and priority-subset) statistics for orthogonal aliquots.
 
     The heavy per-protein scan is cached independently of the priority set, so
     aggregation for the whole proteome and any queried subset is instant once the
-    scan exists.
+    scan exists. `require_observed` applies the PeptideAtlas empirical gate.
     """
     order = list(enzyme_names)
-    records = _scan(order, label_residues, min_len, max_len, missed, progress,
-                    use_cache)
+    records = _scan(order, label_residues, min_len, max_len, missed,
+                    require_observed, progress, use_cache)
     n = len(records)
     prio_set = {a.upper() for a in (priority_accs or [])}
     prio_records = [r for r in records if r[0].upper() in prio_set]
@@ -263,6 +285,7 @@ def proteome_summary(enzyme_names, label_residues=("K", "R"), min_len=7, max_len
         "n_proteins": n,
         "n_priority": n_prio,
         "enzymes": order,
+        "observed_gate": bool(require_observed),
         "label": "+".join(sorted(r.upper() for r in label_residues)),
         "whole": {"0": _finalise(whole["0"], n), "M": _finalise(whole["M"], n)},
         "priority": ({"0": _finalise(prio["0"], n_prio),
