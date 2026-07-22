@@ -1,0 +1,3 @@
+# Large PeptideAtlas raw exports (distilled copy lives in ase_assay/.peptideatlas/)
+*.xls
+query_guest_*
