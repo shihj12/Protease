@@ -1,0 +1,37 @@
+combination,enzymes,label,covered_residues,total_residues,residue_weighted_pct,median_pct
+Trypsin/Lys-C + ProAlanase,Trypsin;Lys-C;ProAlanase,K+R,11078013,11418104,97.02147571961159,100.0
+Trypsin/Lys-C + ProAlanase,Trypsin;Lys-C;ProAlanase,L,11088945,11418104,97.11721841034203,100.0
+Trypsin/Lys-C + ProAlanase,Trypsin;Lys-C;ProAlanase,T,10462093,11418104,91.62723513465984,94.31818181818181
+Trypsin/Lys-C + ProAlanase,Trypsin;Lys-C;ProAlanase,I,9492216,11418104,83.13303154359077,88.62115127175367
+Trypsin/Lys-C + ProAlanase,Trypsin;Lys-C;ProAlanase,V,10564113,11418104,92.5207284852196,96.18506493506493
+Trypsin/Lys-C + ProAlanase,Trypsin;Lys-C;ProAlanase,H,8212495,11418104,71.92520754759283,73.89312977099236
+Trypsin/Lys-C + Elastase,Trypsin;Lys-C;Elastase,K+R,10987905,11418104,96.23230792082468,100.0
+Trypsin/Lys-C + Elastase,Trypsin;Lys-C;Elastase,L,11047347,11418104,96.75290223315535,99.68847352024922
+Trypsin/Lys-C + Elastase,Trypsin;Lys-C;Elastase,T,10170659,11418104,89.07484990502802,90.97135740971358
+Trypsin/Lys-C + Elastase,Trypsin;Lys-C;Elastase,I,9178635,11418104,80.38668241242154,84.8249027237354
+Trypsin/Lys-C + Elastase,Trypsin;Lys-C;Elastase,V,10347347,11418104,90.6222872028491,93.41176470588235
+Trypsin/Lys-C + Elastase,Trypsin;Lys-C;Elastase,H,7741698,11418104,67.8019573127027,69.18604651162791
+Trypsin/Lys-C + Pepsin,Trypsin;Lys-C;Pepsin,K+R,11030079,11418104,96.60166871837916,100.0
+Trypsin/Lys-C + Pepsin,Trypsin;Lys-C;Pepsin,L,11112168,11418104,97.32060594298318,100.0
+Trypsin/Lys-C + Pepsin,Trypsin;Lys-C;Pepsin,T,10298538,11418104,90.19481693282877,92.46406570841889
+Trypsin/Lys-C + Pepsin,Trypsin;Lys-C;Pepsin,I,9352290,11418104,81.90755663111844,86.63883089770354
+Trypsin/Lys-C + Pepsin,Trypsin;Lys-C;Pepsin,V,10440108,11418104,91.43469003260086,94.67005076142132
+Trypsin/Lys-C + Pepsin,Trypsin;Lys-C;Pepsin,H,7978355,11418104,69.87460440017011,71.5909090909091
+Trypsin/Lys-C + ProAlanase + Elastase,Trypsin;Lys-C;ProAlanase;Elastase,K+R,11133158,11418104,97.50443681367764,100.0
+Trypsin/Lys-C + ProAlanase + Elastase,Trypsin;Lys-C;ProAlanase;Elastase,L,11177131,11418104,97.88955329186001,100.0
+Trypsin/Lys-C + ProAlanase + Elastase,Trypsin;Lys-C;ProAlanase;Elastase,T,10547474,11418104,92.37500376594923,94.9367088607595
+Trypsin/Lys-C + ProAlanase + Elastase,Trypsin;Lys-C;ProAlanase;Elastase,I,9588653,11418104,83.97762886027313,89.33764135702747
+Trypsin/Lys-C + ProAlanase + Elastase,Trypsin;Lys-C;ProAlanase;Elastase,V,10674809,11418104,93.4902064300693,96.88995215311004
+Trypsin/Lys-C + ProAlanase + Elastase,Trypsin;Lys-C;ProAlanase;Elastase,H,8307448,11418104,72.75680796041094,74.81481481481481
+Trypsin/Lys-C + Chymotrypsin + Elastase,Trypsin;Lys-C;Chymotrypsin;Elastase,K+R,11153630,11418104,97.68373102924969,100.0
+Trypsin/Lys-C + Chymotrypsin + Elastase,Trypsin;Lys-C;Chymotrypsin;Elastase,L,11181857,11418104,97.93094370133605,100.0
+Trypsin/Lys-C + Chymotrypsin + Elastase,Trypsin;Lys-C;Chymotrypsin;Elastase,T,10577474,11418104,92.63774441010521,95.43147208121827
+Trypsin/Lys-C + Chymotrypsin + Elastase,Trypsin;Lys-C;Chymotrypsin;Elastase,I,9632164,11418104,84.35869913253549,89.9488926746167
+Trypsin/Lys-C + Chymotrypsin + Elastase,Trypsin;Lys-C;Chymotrypsin;Elastase,V,10687640,11418104,93.60258060357481,97.21577726218098
+Trypsin/Lys-C + Chymotrypsin + Elastase,Trypsin;Lys-C;Chymotrypsin;Elastase,H,8362255,11418104,73.2368088432195,75.54744525547446
+Trypsin/Lys-C + ProAlanase + Pepsin,Trypsin;Lys-C;ProAlanase;Pepsin,K+R,11170827,11418104,97.83434272450137,100.0
+Trypsin/Lys-C + ProAlanase + Pepsin,Trypsin;Lys-C;ProAlanase;Pepsin,L,11214077,11418104,98.21312715315958,100.0
+Trypsin/Lys-C + ProAlanase + Pepsin,Trypsin;Lys-C;ProAlanase;Pepsin,T,10636009,11418104,93.1503951969609,95.90062111801242
+Trypsin/Lys-C + ProAlanase + Pepsin,Trypsin;Lys-C;ProAlanase;Pepsin,I,9703095,11418104,84.97991435355642,90.55793991416309
+Trypsin/Lys-C + ProAlanase + Pepsin,Trypsin;Lys-C;ProAlanase;Pepsin,V,10737311,11418104,94.03760028810387,97.5975975975976
+Trypsin/Lys-C + ProAlanase + Pepsin,Trypsin;Lys-C;ProAlanase;Pepsin,H,8465826,11418104,74.14388588508214,76.35410599883518

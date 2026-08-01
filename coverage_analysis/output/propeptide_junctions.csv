@@ -1,0 +1,50 @@
+gene,accession,protein,bond,side,product_start,product_end,product,junction_type,evidence
+CTSB,P07858,Cathepsin B,79|80,N,80,333,Cathepsin B,propeptide,experimental
+CTSB,P07858,Cathepsin B,333|334,C,80,333,Cathepsin B,propeptide,
+CTSC,P53634,Dipeptidyl peptidase 1,134|135,C,25,134,Dipeptidyl peptidase 1 exclusion domain chain,propeptide,experimental
+CTSC,P53634,Dipeptidyl peptidase 1,230|231,N,231,394,Dipeptidyl peptidase 1 heavy chain,propeptide,experimental
+CTSD,P07339,Cathepsin D,64|65,N,65,412,Cathepsin D,propeptide,
+CTSE,P14091,Cathepsin E,53|54,N,54,396,Cathepsin E form I,propeptide,experimental
+CTSF,Q9UBX1,Cathepsin F,270|271,N,271,484,Cathepsin F,propeptide,
+CTSH,P09668,Pro-cathepsin H,115|116,N,116,335,Cathepsin H,propeptide,experimental
+CTSK,P43235,Cathepsin K,114|115,N,115,329,Cathepsin K,propeptide,
+CTSL,P07711,Procathepsin L,113|114,N,114,333,Cathepsin L,propeptide,experimental
+CTSL,P07711,Procathepsin L,288|289,C,114,288,Cathepsin L heavy chain,propeptide,
+CTSL,P07711,Procathepsin L,291|292,N,292,333,Cathepsin L light chain,propeptide,
+CTSO,P43234,Cathepsin O,107|108,N,108,321,Cathepsin O,propeptide,
+CTSS,P25774,Cathepsin S,114|115,N,115,331,Cathepsin S,propeptide,curator inference
+CTSV,O60911,Cathepsin L2,113|114,N,114,334,Cathepsin L2,propeptide,
+CTSW,P56202,Cathepsin W,127|128,N,128,376,Cathepsin W,propeptide,sequence model
+CTSZ,Q9UBR2,Cathepsin Z,61|62,N,62,303,Cathepsin Z,propeptide,
+CTSG,P08311,Cathepsin G,20|21,N,21,244,Cathepsin G,propeptide,experimental
+CTSG,P08311,Cathepsin G,244|245,C,21,244,Cathepsin G,propeptide,experimental
+LGMN,Q99538,Legumain,323|324,C,18,323,Legumain,propeptide,curator inference
+TPP1,O14773,Tripeptidyl-peptidase 1,195|196,N,196,563,Tripeptidyl-peptidase 1,propeptide,experimental
+GAA,P10253,Lysosomal alpha-glucosidase,69|70,N,70,952,Lysosomal alpha-glucosidase,propeptide,experimental
+GLB1,P16278,Beta-galactosidase,28|29,N,29,677,Beta-galactosidase,propeptide,curator inference
+HEXA,P06865,Beta-hexosaminidase subunit alpha,88|89,N,89,529,Beta-hexosaminidase subunit alpha,propeptide,experimental
+HEXB,P07686,Beta-hexosaminidase subunit beta,121|122,N,122,556,Beta-hexosaminidase subunit beta,propeptide,experimental
+GRN,P28799,Progranulin,47|48,C,18,47,Paragranulin,granulin,
+GRN,P28799,Progranulin,57|58,N,58,113,Granulin-1,granulin,
+GRN,P28799,Progranulin,113|114,C,58,113,Granulin-1,granulin,
+GRN,P28799,Progranulin,122|123,N,123,179,Granulin-2,granulin,
+GRN,P28799,Progranulin,179|180,C,123,179,Granulin-2,granulin,
+GRN,P28799,Progranulin,205|206,N,206,261,Granulin-3,granulin,
+GRN,P28799,Progranulin,261|262,C,206,261,Granulin-3,granulin,
+GRN,P28799,Progranulin,280|281,N,281,336,Granulin-4,granulin,
+GRN,P28799,Progranulin,336|337,C,281,336,Granulin-4,granulin,
+GRN,P28799,Progranulin,363|364,N,364,417,Granulin-5,granulin,
+GRN,P28799,Progranulin,417|418,C,364,417,Granulin-5,granulin,
+GRN,P28799,Progranulin,441|442,N,442,496,Granulin-6,granulin,
+GRN,P28799,Progranulin,496|497,C,442,496,Granulin-6,granulin,
+GRN,P28799,Progranulin,517|518,N,518,573,Granulin-7,granulin,
+GRN,P28799,Progranulin,573|574,C,518,573,Granulin-7,granulin,
+PSMB1,P20618,Proteasome subunit beta type-1,28|29,N,29,241,Proteasome subunit beta type-1,propeptide,experimental
+PSMB4,P28070,Proteasome subunit beta type-4,45|46,N,46,264,Proteasome subunit beta type-4,propeptide,experimental
+PSMB5,P28074,Proteasome subunit beta type-5,59|60,N,60,263,Proteasome subunit beta type-5,propeptide,experimental
+PSMB6,P28072,Proteasome subunit beta type-6,34|35,N,35,239,Proteasome subunit beta type-6,propeptide,experimental
+PSMB7,Q99436,Proteasome subunit beta type-7,43|44,N,44,277,Proteasome subunit beta type-7,propeptide,
+PSMB8,P28062,Proteasome subunit beta type-8,72|73,N,73,276,Proteasome subunit beta type-8,propeptide,by similarity
+PSMB9,P28065,Proteasome subunit beta type-9,20|21,N,21,219,Proteasome subunit beta type-9,propeptide,
+PSMB10,P40306,Proteasome subunit beta type-10,39|40,N,40,273,Proteasome subunit beta type-10,propeptide,by similarity
+PSMB11,A5LHX3,Proteasome subunit beta type-11,49|50,N,50,300,Proteasome subunit beta type-11,propeptide,by similarity

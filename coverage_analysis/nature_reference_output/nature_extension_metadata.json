@@ -1,0 +1,58 @@
+{
+  "generated_utc": "2026-08-01T06:05:04.941542+00:00",
+  "output_scope": "Nature reference SILAC and pro-peptide analyses",
+  "dataset": "PXD024364 / MSV000086944",
+  "nature_enzymes": [
+    "Trypsin",
+    "Lys-C",
+    "Chymotrypsin",
+    "Lys-N",
+    "Glu-C",
+    "Asp-N"
+  ],
+  "silac_top_designs": [
+    "Trypsin/Lys-C + Glu-C",
+    "Trypsin/Lys-C + Asp-N",
+    "Trypsin/Lys-C + Chymotrypsin",
+    "Trypsin/Lys-C + Glu-C + Asp-N",
+    "Trypsin/Lys-C + Chymotrypsin + Glu-C",
+    "Trypsin/Lys-C + Chymotrypsin + Asp-N"
+  ],
+  "propeptide_proteins": 30,
+  "propeptide_junctions": 49,
+  "candidate_sequences_observed": 118,
+  "reference_search_specificity": "specific cleavage",
+  "mature_state_limitation": "The deposited MaxQuant search required specific cleavage. Semi-specific mature neo-terminal peptides were not searched, so absence of mature-state evidence is not evidence of absent processing.",
+  "coverage_provenance": {
+    "dataset": "PXD024364 / MSV000086944",
+    "source_zip": "ftp://massive-ftp.ucsd.edu/v03/MSV000086944/search/txt.zip",
+    "maxquant_members": [
+      "txt/peptides.txt",
+      "txt/proteinGroups.txt"
+    ],
+    "fasta_files": [
+      "UP000005640_9606.fasta",
+      "UP000005640_9606_additional.fasta",
+      "Homo_sapiens.GRCh38.pep.all.fa",
+      "Homo_sapiens.GRCh38.pep.abinitio.fa"
+    ],
+    "fasta_sha256": {
+      "UP000005640_9606.fasta": "295affb2702daae14361f37d9842d72cbdef17bc1ef675f1e8f1af9f4ccd9eae",
+      "UP000005640_9606_additional.fasta": "8d522ff389c5284996d2c4b87e4d04e2261c606824a4ba3db44bf7003ed6b79d",
+      "Homo_sapiens.GRCh38.pep.all.fa": "3d3458546843eadcbf903860037ee359cdbe7ab2adafa54e8fac224459ab04e2",
+      "Homo_sapiens.GRCh38.pep.abinitio.fa": "ad93c30ce7e2c7f744a2c62b37b9c1c0a1c5f26f3e5ff69c0d8bbc1eabe88a54"
+    },
+    "peptide_cache": "C:\\Users\\Jamison's PC\\Documents\\GitHub\\Mapper\\Protease\\coverage_analysis\\reference_cache\\nature_peptides_v1.tsv.gz",
+    "per_protein_cache": "C:\\Users\\Jamison's PC\\Documents\\GitHub\\Mapper\\Protease\\coverage_analysis\\reference_cache\\nature_per_protein_v1.tsv.gz"
+  },
+  "silac_provenance": {
+    "dataset": "PXD024364 / MSV000086944",
+    "label_cache": "C:\\Users\\Jamison's PC\\Documents\\GitHub\\Mapper\\Protease\\coverage_analysis\\reference_cache\\nature_label_coverage_v1_53face3d24b8.tsv.gz",
+    "peptide_cache": "C:\\Users\\Jamison's PC\\Documents\\GitHub\\Mapper\\Protease\\coverage_analysis\\reference_cache\\nature_peptides_v1.tsv.gz",
+    "search_specificity": "specific cleavage"
+  },
+  "sources": {
+    "study": "https://doi.org/10.1038/s41587-023-01714-x",
+    "dataset": "https://proteomecentral.proteomexchange.org/cgi/GetDataset?ID=PXD024364"
+  }
+}

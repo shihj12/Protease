@@ -1,0 +1,47 @@
+combination,enzymes,n_proteins,covered_residues,total_residues,residue_weighted_pct,median_pct,rank,family
+ProAlanase,ProAlanase,20431,11078490,11418104,97.02565329585367,100.0,1,single
+Elastase,Elastase,20431,11052638,11418104,96.79924092476298,97.57665677546983,2,single
+Pepsin,Pepsin,20431,10783585,11418104,94.44286897369301,97.6470588235294,3,single
+Trypsin/Lys-C,Trypsin;Lys-C,20431,10736475,11418104,94.0302785821534,100.0,4,single
+Trypsin,Trypsin,20431,10668536,11418104,93.43526736137629,100.0,5,single
+Glu-C,Glu-C,20431,9329514,11418104,81.70808393407522,86.29825889477668,6,single
+Chymotrypsin,Chymotrypsin,20431,9304273,11418104,81.48702271410384,91.89526184538653,7,single
+Arg-N,Arg-N,20431,8493174,11418104,74.38340025629473,79.15057915057915,8,single
+Lys-N,Lys-N,20431,8075512,11418104,70.7255074923122,75.57692307692308,9,single
+Asp-N,Asp-N,20431,7985526,11418104,69.93740817214487,71.98975234842015,10,single
+Trypsin/Lys-C + ProAlanase,Trypsin;Lys-C;ProAlanase,20431,11390562,11418104,99.75878657262186,100.0,1,two
+Trypsin/Lys-C + Elastase,Trypsin;Lys-C;Elastase,20431,11381182,11418104,99.67663633121576,100.0,2,two
+Trypsin/Lys-C + Pepsin,Trypsin;Lys-C;Pepsin,20431,11335264,11418104,99.27448550127062,100.0,3,two
+Trypsin/Lys-C + Chymotrypsin,Trypsin;Lys-C;Chymotrypsin,20431,11222367,11418104,98.28573115116134,100.0,4,two
+Trypsin/Lys-C + Glu-C,Trypsin;Lys-C;Glu-C,20431,11141829,11418104,97.5803776178602,100.0,5,two
+Trypsin/Lys-C + Asp-N,Trypsin;Lys-C;Asp-N,20431,11095004,11418104,97.17028326244007,100.0,6,two
+Trypsin/Lys-C + Arg-N,Trypsin;Lys-C;Arg-N,20431,10813991,11418104,94.70916537456657,100.0,7,two
+Trypsin/Lys-C + Lys-N,Trypsin;Lys-C;Lys-N,20431,10741720,11418104,94.07621440477334,100.0,8,two
+Trypsin/Lys-C + ProAlanase + Elastase,Trypsin;Lys-C;ProAlanase;Elastase,20431,11413068,11418104,99.95589460386768,100.0,1,three
+Trypsin/Lys-C + Chymotrypsin + Elastase,Trypsin;Lys-C;Chymotrypsin;Elastase,20431,11409567,11418104,99.92523277069468,100.0,2,three
+Trypsin/Lys-C + ProAlanase + Pepsin,Trypsin;Lys-C;ProAlanase;Pepsin,20431,11408859,11418104,99.9190320914926,100.0,3,three
+Trypsin/Lys-C + Elastase + Pepsin,Trypsin;Lys-C;Elastase;Pepsin,20431,11404865,11418104,99.88405255373397,100.0,4,three
+Trypsin/Lys-C + Chymotrypsin + ProAlanase,Trypsin;Lys-C;Chymotrypsin;ProAlanase,20431,11403643,11418104,99.87335025149534,100.0,5,three
+Trypsin/Lys-C + Glu-C + ProAlanase,Trypsin;Lys-C;Glu-C;ProAlanase,20431,11402419,11418104,99.86263043321378,100.0,6,three
+Trypsin/Lys-C + Asp-N + ProAlanase,Trypsin;Lys-C;Asp-N;ProAlanase,20431,11400941,11418104,99.84968607747837,100.0,7,three
+Trypsin/Lys-C + Glu-C + Elastase,Trypsin;Lys-C;Glu-C;Elastase,20431,11397278,11418104,99.81760544482691,100.0,8,three
+Trypsin/Lys-C + Asp-N + Elastase,Trypsin;Lys-C;Asp-N;Elastase,20431,11396985,11418104,99.81503934453566,100.0,9,three
+Trypsin/Lys-C + Arg-N + ProAlanase,Trypsin;Lys-C;Arg-N;ProAlanase,20431,11393928,11418104,99.78826607289616,100.0,10,three
+Trypsin/Lys-C + Lys-N + ProAlanase,Trypsin;Lys-C;Lys-N;ProAlanase,20431,11390690,11418104,99.75990759937027,100.0,11,three
+Trypsin/Lys-C + Arg-N + Elastase,Trypsin;Lys-C;Arg-N;Elastase,20431,11384141,11418104,99.70255131675101,100.0,12,three
+Trypsin/Lys-C + Lys-N + Elastase,Trypsin;Lys-C;Lys-N;Elastase,20431,11381364,11418104,99.67823029112364,100.0,13,three
+Trypsin/Lys-C + Chymotrypsin + Pepsin,Trypsin;Lys-C;Chymotrypsin;Pepsin,20431,11375050,11418104,99.62293214355027,100.0,14,three
+Trypsin/Lys-C + Glu-C + Pepsin,Trypsin;Lys-C;Glu-C;Pepsin,20431,11371762,11418104,99.59413576895078,100.0,15,three
+Trypsin/Lys-C + Asp-N + Pepsin,Trypsin;Lys-C;Asp-N;Pepsin,20431,11367133,11418104,99.55359488755751,100.0,16,three
+Trypsin/Lys-C + Arg-N + Pepsin,Trypsin;Lys-C;Arg-N;Pepsin,20431,11344850,11418104,99.35843989509992,100.0,17,three
+Trypsin/Lys-C + Lys-N + Pepsin,Trypsin;Lys-C;Lys-N;Pepsin,20431,11335767,11418104,99.27889078607096,100.0,18,three
+Trypsin/Lys-C + Chymotrypsin + Glu-C,Trypsin;Lys-C;Chymotrypsin;Glu-C,20431,11332842,11418104,99.25327357326576,100.0,19,three
+Trypsin/Lys-C + Chymotrypsin + Asp-N,Trypsin;Lys-C;Chymotrypsin;Asp-N,20431,11307976,11418104,99.03549661134633,100.0,20,three
+Trypsin/Lys-C + Chymotrypsin + Arg-N,Trypsin;Lys-C;Chymotrypsin;Arg-N,20431,11246113,11418104,98.49369912903228,100.0,21,three
+Trypsin/Lys-C + Glu-C + Asp-N,Trypsin;Lys-C;Glu-C;Asp-N,20431,11242560,11418104,98.46258187874274,100.0,22,three
+Trypsin/Lys-C + Chymotrypsin + Lys-N,Trypsin;Lys-C;Chymotrypsin;Lys-N,20431,11223791,11418104,98.29820257373729,100.0,23,three
+Trypsin/Lys-C + Glu-C + Arg-N,Trypsin;Lys-C;Glu-C;Arg-N,20431,11170243,11418104,97.8292280399618,100.0,24,three
+Trypsin/Lys-C + Lys-N + Glu-C,Trypsin;Lys-C;Lys-N;Glu-C,20431,11143119,11418104,97.59167546555891,100.0,25,three
+Trypsin/Lys-C + Asp-N + Arg-N,Trypsin;Lys-C;Asp-N;Arg-N,20431,11129587,11418104,97.47316191900161,100.0,26,three
+Trypsin/Lys-C + Lys-N + Asp-N,Trypsin;Lys-C;Lys-N;Asp-N,20431,11096817,11418104,97.18616155536856,100.0,27,three
+Trypsin/Lys-C + Lys-N + Arg-N,Trypsin;Lys-C;Lys-N;Arg-N,20431,10817767,11418104,94.74223566364434,100.0,28,three

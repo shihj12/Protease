@@ -1,0 +1,75 @@
+{
+  "generated_utc": "2026-08-01T05:13:43.072161+00:00",
+  "theoretical_fasta": "C:\\Users\\Jamison's PC\\Documents\\GitHub\\Mapper\\Protease\\ase_assay\\uniprotkb_human_AND_model_organism_9606_2026_07_21.fasta",
+  "theoretical_proteins": 20431,
+  "theoretical_residues": 11418104,
+  "minimum_peptide_length": 7,
+  "maximum_peptide_length": 52,
+  "missed_cleavages": 2,
+  "coverage_metric_in_figures": "residue-weighted sequence coverage",
+  "parallel_digest_rule": "union of independently digested aliquot residue masks",
+  "peptide_instances_by_enzyme": {
+    "Trypsin": 2540992,
+    "Lys-C": 1271606,
+    "Chymotrypsin": 1729727,
+    "Lys-N": 1273703,
+    "Glu-C": 1640171,
+    "Asp-N": 1006887,
+    "Arg-N": 1231416,
+    "ProAlanase": 2958497,
+    "Elastase": 4183420,
+    "Pepsin": 3295819
+  },
+  "protease_rules": {
+    "Trypsin": "C-terminal to K/R, except before P.",
+    "Lys-C": "C-terminal to K.",
+    "Chymotrypsin": "High-specificity rule: C-terminal to F/Y/W, except before P.",
+    "Lys-N": "N-terminal to K.",
+    "Glu-C": "C-terminal to E.",
+    "Asp-N": "N-terminal to D.",
+    "Arg-N": "Theoretical N-terminal arginine-specific rule.",
+    "ProAlanase": "C-terminal to P and A; preferential rather than perfectly specific.",
+    "Elastase": "Proteome Discoverer rule: C-terminal to A/L/I/V, except before P.",
+    "Pepsin": "PeptideCutter pH 1.3 preference model."
+  },
+  "top_two_group_designs": [
+    "Trypsin/Lys-C + ProAlanase",
+    "Trypsin/Lys-C + Elastase",
+    "Trypsin/Lys-C + Pepsin"
+  ],
+  "top_three_group_designs": [
+    "Trypsin/Lys-C + ProAlanase + Elastase",
+    "Trypsin/Lys-C + Chymotrypsin + Elastase",
+    "Trypsin/Lys-C + ProAlanase + Pepsin"
+  ],
+  "nature": {
+    "dataset": "PXD024364 / MSV000086944",
+    "source_zip": "ftp://massive-ftp.ucsd.edu/v03/MSV000086944/search/txt.zip",
+    "maxquant_members": [
+      "txt/peptides.txt",
+      "txt/proteinGroups.txt"
+    ],
+    "fasta_files": [
+      "UP000005640_9606.fasta",
+      "UP000005640_9606_additional.fasta",
+      "Homo_sapiens.GRCh38.pep.all.fa",
+      "Homo_sapiens.GRCh38.pep.abinitio.fa"
+    ],
+    "fasta_sha256": {
+      "UP000005640_9606.fasta": "295affb2702daae14361f37d9842d72cbdef17bc1ef675f1e8f1af9f4ccd9eae",
+      "UP000005640_9606_additional.fasta": "8d522ff389c5284996d2c4b87e4d04e2261c606824a4ba3db44bf7003ed6b79d",
+      "Homo_sapiens.GRCh38.pep.all.fa": "3d3458546843eadcbf903860037ee359cdbe7ab2adafa54e8fac224459ab04e2",
+      "Homo_sapiens.GRCh38.pep.abinitio.fa": "ad93c30ce7e2c7f744a2c62b37b9c1c0a1c5f26f3e5ff69c0d8bbc1eabe88a54"
+    },
+    "peptide_cache": "C:\\Users\\Jamison's PC\\Documents\\GitHub\\Mapper\\Protease\\coverage_analysis\\reference_cache\\nature_peptides_v1.tsv.gz",
+    "per_protein_cache": "C:\\Users\\Jamison's PC\\Documents\\GitHub\\Mapper\\Protease\\coverage_analysis\\reference_cache\\nature_per_protein_v1.tsv.gz"
+  },
+  "citations": {
+    "nature_study": "https://doi.org/10.1038/s41587-023-01714-x",
+    "nature_dataset": "https://proteomecentral.proteomexchange.org/cgi/GetDataset?ID=PXD024364",
+    "spectronaut_manual": "https://biognosys.com/content/uploads/2024/09/Spectronaut-19-manual-v4.pdf",
+    "expasy_rules": "https://web.expasy.org/peptide_cutter/peptidecutter_enzymes.html",
+    "proalanase": "https://www.promega.com/products/mass-spectrometry/proteases-and-surfactants/proalanase-mass-spec-grade/",
+    "elastase_rule": "https://docs.thermofisher.com/r/Proteome-Discoverer-3.1-User-Guide/en-US1324471691v1"
+  }
+}

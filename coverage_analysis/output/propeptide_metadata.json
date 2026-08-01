@@ -1,0 +1,80 @@
+{
+  "generated_utc": "2026-08-01T05:30:58.231833+00:00",
+  "preset_symbols": [
+    "CTSB",
+    "CTSC",
+    "CTSD",
+    "CTSE",
+    "CTSF",
+    "CTSH",
+    "CTSK",
+    "CTSL",
+    "CTSO",
+    "CTSS",
+    "CTSV",
+    "CTSW",
+    "CTSZ",
+    "CTSG",
+    "LGMN",
+    "TPP1",
+    "GAA",
+    "GLB1",
+    "HEXA",
+    "HEXB",
+    "GRN",
+    "PSMB1",
+    "PSMB4",
+    "PSMB5",
+    "PSMB6",
+    "PSMB7",
+    "PSMB8",
+    "PSMB9",
+    "PSMB10",
+    "PSMB11"
+  ],
+  "proteins": 30,
+  "processing_junctions": 49,
+  "conventional_propeptide_junctions": 34,
+  "pgrn_granulin_junctions": 15,
+  "minimum_peptide_length": 7,
+  "maximum_peptide_length": 52,
+  "missed_cleavages": 2,
+  "joint_quantification": "A protein-unique intact-junction spanning peptide and a protein-unique mature neo-terminal peptide, potentially from different parallel aliquots.",
+  "exact_digest_cut_rule": "A missed-cleavage spanning peptide may report intact precursor, but the enzyme-generated terminal peptide is not mature-state-specific.",
+  "uniqueness": "Human FASTA substring uniqueness with I/L collapsed.",
+  "top_two_group_designs": [
+    {
+      "combination": "Trypsin/Lys-C + ProAlanase",
+      "both_unique": 49,
+      "both_unique_zero_missed": 39
+    },
+    {
+      "combination": "Trypsin/Lys-C + Elastase",
+      "both_unique": 49,
+      "both_unique_zero_missed": 31
+    },
+    {
+      "combination": "Trypsin/Lys-C + Chymotrypsin",
+      "both_unique": 48,
+      "both_unique_zero_missed": 41
+    }
+  ],
+  "top_three_group_designs": [
+    {
+      "combination": "Trypsin/Lys-C + Chymotrypsin + Glu-C",
+      "both_unique": 49,
+      "both_unique_zero_missed": 48
+    },
+    {
+      "combination": "Trypsin/Lys-C + Glu-C + Pepsin",
+      "both_unique": 49,
+      "both_unique_zero_missed": 48
+    },
+    {
+      "combination": "Trypsin/Lys-C + Chymotrypsin + Asp-N",
+      "both_unique": 49,
+      "both_unique_zero_missed": 46
+    }
+  ],
+  "pgrn_source": "https://www.uniprot.org/uniprotkb/P28799/entry"
+}
