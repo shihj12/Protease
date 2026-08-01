@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-08-01T06:05:04.941542+00:00",
+  "generated_utc": "2026-08-01T06:44:38.461507+00:00",
   "output_scope": "Nature reference SILAC and pro-peptide analyses",
   "dataset": "PXD024364 / MSV000086944",
   "nature_enzymes": [
@@ -48,6 +48,12 @@
   "silac_provenance": {
     "dataset": "PXD024364 / MSV000086944",
     "label_cache": "C:\\Users\\Jamison's PC\\Documents\\GitHub\\Mapper\\Protease\\coverage_analysis\\reference_cache\\nature_label_coverage_v1_53face3d24b8.tsv.gz",
+    "peptide_cache": "C:\\Users\\Jamison's PC\\Documents\\GitHub\\Mapper\\Protease\\coverage_analysis\\reference_cache\\nature_peptides_v1.tsv.gz",
+    "search_specificity": "specific cleavage"
+  },
+  "kr_plus_one_provenance": {
+    "dataset": "PXD024364 / MSV000086944",
+    "label_cache": "C:\\Users\\Jamison's PC\\Documents\\GitHub\\Mapper\\Protease\\coverage_analysis\\reference_cache\\nature_label_coverage_v1_8bb44d0a028e.tsv.gz",
     "peptide_cache": "C:\\Users\\Jamison's PC\\Documents\\GitHub\\Mapper\\Protease\\coverage_analysis\\reference_cache\\nature_peptides_v1.tsv.gz",
     "search_specificity": "specific cleavage"
   },

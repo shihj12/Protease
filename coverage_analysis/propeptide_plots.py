@@ -10,6 +10,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 
+matplotlib.rcParams["svg.hashsalt"] = "protease-coverage"
+
 
 TEXT = "#102a43"
 COLORS = {
@@ -23,7 +25,12 @@ COLORS = {
 def _save(figure, destination: Path) -> None:
     destination.parent.mkdir(parents=True, exist_ok=True)
     figure.savefig(destination, dpi=300, bbox_inches="tight", facecolor="white")
-    figure.savefig(destination.with_suffix(".svg"), bbox_inches="tight", facecolor="white")
+    svg_path = destination.with_suffix(".svg")
+    figure.savefig(svg_path, bbox_inches="tight", facecolor="white")
+    text = svg_path.read_text(encoding="utf-8")
+    lines = [line.rstrip() for line in text.splitlines()]
+    with svg_path.open("w", encoding="utf-8", newline="\n") as handle:
+        handle.write("\n".join(lines) + "\n")
     plt.close(figure)
 
 

@@ -28,6 +28,11 @@ LABELS: dict[str, frozenset[str]] = {
     "H": frozenset("H"),
 }
 
+KR_PLUS_ONE_LABELS: dict[str, frozenset[str]] = {
+    f"K+R+{residue}": frozenset(f"KR{residue}")
+    for residue in ("L", "T", "I", "V", "H")
+}
+
 NATURE_ENZYMES = (
     "Trypsin",
     "Lys-C",

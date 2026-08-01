@@ -9,10 +9,20 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+matplotlib.rcParams["svg.hashsalt"] = "protease-coverage"
+
 
 COLOR = "#486581"
 LIGHT_COLOR = "#829ab1"
 TEXT_COLOR = "#102a43"
+
+
+def _save_svg_without_trailing_space(figure, destination: Path) -> None:
+    figure.savefig(destination, bbox_inches="tight", facecolor="white")
+    text = destination.read_text(encoding="utf-8")
+    lines = [line.rstrip() for line in text.splitlines()]
+    with destination.open("w", encoding="utf-8", newline="\n") as handle:
+        handle.write("\n".join(lines) + "\n")
 
 
 def _style_axis(axis) -> None:
@@ -48,7 +58,7 @@ def horizontal_coverage_plot(
     figure.tight_layout()
     destination.parent.mkdir(parents=True, exist_ok=True)
     figure.savefig(destination, dpi=300, bbox_inches="tight", facecolor="white")
-    figure.savefig(destination.with_suffix(".svg"), bbox_inches="tight", facecolor="white")
+    _save_svg_without_trailing_space(figure, destination.with_suffix(".svg"))
     plt.close(figure)
 
 
@@ -57,18 +67,21 @@ def silac_panel_plot(
     combinations: list[str],
     destination: Path,
     metric: str = "residue_weighted_pct",
+    label_order: list[str] | None = None,
+    highlight_label: str | None = "K+R",
 ) -> None:
     by_combination: dict[str, list[dict[str, object]]] = {}
     for row in rows:
         by_combination.setdefault(str(row["combination"]), []).append(row)
-    label_order = ["K+R", "L", "T", "I", "V", "H"]
+    label_order = label_order or ["K+R", "L", "T", "I", "V", "H"]
     figure, axes = plt.subplots(2, 3, figsize=(14.2, 7.7), sharex=True)
     for axis, combination in zip(axes.flat, combinations):
         lookup = {str(row["label"]): row for row in by_combination[combination]}
         labels = label_order[::-1]
         values = [float(lookup[label][metric]) for label in labels]
         bars = axis.barh(labels, values, color=LIGHT_COLOR, height=0.62)
-        bars[-1].set_color(COLOR)
+        if highlight_label in labels:
+            bars[labels.index(highlight_label)].set_color(COLOR)
         _style_axis(axis)
         axis.set_title(combination, fontsize=9.5, color=TEXT_COLOR, pad=8)
         axis.bar_label(
@@ -83,5 +96,5 @@ def silac_panel_plot(
     figure.tight_layout(w_pad=2.0, h_pad=2.0)
     destination.parent.mkdir(parents=True, exist_ok=True)
     figure.savefig(destination, dpi=300, bbox_inches="tight", facecolor="white")
-    figure.savefig(destination.with_suffix(".svg"), bbox_inches="tight", facecolor="white")
+    _save_svg_without_trailing_space(figure, destination.with_suffix(".svg"))
     plt.close(figure)

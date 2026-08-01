@@ -16,6 +16,7 @@ from coverage_analysis.nature_reference import nature_coverage
 from coverage_analysis.plots import horizontal_coverage_plot, silac_panel_plot
 from coverage_analysis.protease_coverage import (
     LABELS,
+    KR_PLUS_ONE_LABELS,
     MAX_PEPTIDE_LENGTH,
     MIN_PEPTIDE_LENGTH,
     MISSED_CLEAVAGES,
@@ -108,8 +109,9 @@ def run(fasta: Path, output_dir: Path, cache_dir: Path, skip_nature: bool) -> No
     ]
     silac_enzymes = sorted({enzyme for _, enzymes in silac_designs for enzyme in enzymes})
     print("Calculating label-bearing theoretical peptide masks for the top designs")
+    all_silac_labels = {**LABELS, **KR_PLUS_ONE_LABELS}
     _, label_masks, _ = digest_proteome(
-        proteins, silac_enzymes, labels=LABELS, progress=_progress
+        proteins, silac_enzymes, labels=all_silac_labels, progress=_progress
     )
     silac_rows = labelled_design_statistics(proteins, label_masks, silac_designs)
     _write_csv(output_dir / "silac_quantifiable_coverage.csv", silac_rows)
@@ -117,6 +119,29 @@ def run(fasta: Path, output_dir: Path, cache_dir: Path, skip_nature: bool) -> No
         silac_rows,
         [combination for combination, _ in silac_designs],
         output_dir / "graph_7_silac_top_combinations.png",
+    )
+    kr_plus_one_rows = labelled_design_statistics(
+        proteins,
+        label_masks,
+        silac_designs,
+        labels=KR_PLUS_ONE_LABELS,
+    )
+    kr_baselines = {
+        str(row["combination"]): float(row["residue_weighted_pct"])
+        for row in silac_rows
+        if row["label"] == "K+R"
+    }
+    for row in kr_plus_one_rows:
+        baseline = kr_baselines[str(row["combination"])]
+        row["kr_baseline_pct"] = baseline
+        row["gain_over_kr_pct"] = float(row["residue_weighted_pct"]) - baseline
+    _write_csv(output_dir / "silac_kr_plus_one_coverage.csv", kr_plus_one_rows)
+    silac_panel_plot(
+        kr_plus_one_rows,
+        [combination for combination, _ in silac_designs],
+        output_dir / "graph_13_silac_kr_plus_one.png",
+        label_order=list(KR_PLUS_ONE_LABELS),
+        highlight_label="K+R+L",
     )
 
     nature_provenance: dict[str, object] | None = None

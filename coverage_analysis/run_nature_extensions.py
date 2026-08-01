@@ -19,6 +19,7 @@ from coverage_analysis.propeptide_plots import outcome_plot, pgrn_heatmap, prote
 from coverage_analysis.propeptide_quantification import load_preset_entries
 from coverage_analysis.protease_coverage import (
     LABELS,
+    KR_PLUS_ONE_LABELS,
     NATURE_ENZYMES,
     nature_designs,
 )
@@ -90,6 +91,29 @@ def run(output_dir: Path, cache_dir: Path) -> None:
         [name for name, _ in silac_designs],
         output_dir / "graph_1_nature_silac_top_combinations.png",
     )
+    print("Calculating Nature-observed K+R-plus-one-label coverage")
+    kr_plus_one_rows, kr_plus_one_provenance = nature_label_coverage(
+        cache_dir, silac_designs, KR_PLUS_ONE_LABELS, print
+    )
+    kr_baselines = {
+        str(row["combination"]): float(row["residue_weighted_pct"])
+        for row in silac_rows
+        if row["label"] == "K+R"
+    }
+    for row in kr_plus_one_rows:
+        baseline = kr_baselines[str(row["combination"])]
+        row["kr_baseline_pct"] = baseline
+        row["gain_over_kr_pct"] = float(row["residue_weighted_pct"]) - baseline
+    _write_csv(
+        output_dir / "nature_silac_kr_plus_one_coverage.csv", kr_plus_one_rows
+    )
+    silac_panel_plot(
+        kr_plus_one_rows,
+        [name for name, _ in silac_designs],
+        output_dir / "graph_7_nature_silac_kr_plus_one.png",
+        label_order=list(KR_PLUS_ONE_LABELS),
+        highlight_label="K+R+L",
+    )
 
     print("Matching pro-peptide state candidates to Nature-observed peptides")
     entries = load_preset_entries()
@@ -159,6 +183,7 @@ def run(output_dir: Path, cache_dir: Path) -> None:
         ),
         "coverage_provenance": coverage_provenance,
         "silac_provenance": silac_provenance,
+        "kr_plus_one_provenance": kr_plus_one_provenance,
         "sources": {
             "study": "https://doi.org/10.1038/s41587-023-01714-x",
             "dataset": "https://proteomecentral.proteomexchange.org/cgi/GetDataset?ID=PXD024364",

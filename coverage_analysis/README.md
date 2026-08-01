@@ -40,6 +40,9 @@ python -m coverage_analysis.run_analysis --skip-nature
   the top three three-group designs on the second. Each subplot reports the
   theoretical residue-weighted sequence coverage obtainable from peptides carrying at
   least one K+R, L, T, I, V, or H residue.
+- Figure 13 repeats those six designs for combined K+R-plus-one schemes:
+  K+R+L, K+R+T, K+R+I, K+R+V, and K+R+H. Residue unions are calculated at the
+  peptide-mask level, so overlapping coverage is counted once.
 
 Pepsin, ProAlanase, elastase, and Arg-N are necessarily rule-based projections.
 Pepsin in particular has broad, condition-dependent specificity; its graph value
@@ -81,6 +84,10 @@ python -m coverage_analysis.run_nature_extensions
 The SILAC panel uses the top three observed two-group and three-group designs
 from figures 5 and 6, then calculates residue coverage from observed peptides
 carrying K+R, L, T, I, V, or H.
+
+Nature-reference figure 7 repeats those designs for K+R plus each additional
+label. Its plotted values and source table are stored beside the other Nature
+outputs.
 
 The pro-peptide figures match the exact theoretical candidate sequences to the
 Nature `peptides.txt` table, retaining the experiment/enzyme assignment. The

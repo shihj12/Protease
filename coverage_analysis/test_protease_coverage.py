@@ -4,6 +4,7 @@ import unittest
 
 from coverage_analysis.protease_coverage import (
     LABELS,
+    KR_PLUS_ONE_LABELS,
     RULES,
     Protein,
     cleavage_boundaries,
@@ -44,6 +45,17 @@ class DigestionTests(unittest.TestCase):
         self.assertEqual(labelled["L"], interval_mask(5, 9))
         self.assertEqual(count, 2)
 
+    def test_kr_plus_one_label_unions_all_three_residues(self):
+        _, labelled, _ = digest_mask(
+            "AAAAKLLLL",
+            RULES["Lys-C"],
+            KR_PLUS_ONE_LABELS,
+            min_length=1,
+            max_length=20,
+            missed_cleavages=0,
+        )
+        self.assertEqual(labelled["K+R+L"], interval_mask(0, 9))
+
     def test_fasta_parser(self):
         with TemporaryDirectory() as directory:
             path = Path(directory) / "test.fasta"
@@ -56,4 +68,3 @@ class DigestionTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
