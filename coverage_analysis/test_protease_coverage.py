@@ -5,6 +5,8 @@ import unittest
 from coverage_analysis.protease_coverage import (
     LABELS,
     KR_PLUS_ONE_LABELS,
+    LYSINE_LABELS,
+    LYSINE_STUDY_LABELS,
     RULES,
     Protein,
     cleavage_boundaries,
@@ -55,6 +57,27 @@ class DigestionTests(unittest.TestCase):
             missed_cleavages=0,
         )
         self.assertEqual(labelled["K+R+L"], interval_mask(0, 9))
+
+    def test_lysine_label_sets_never_contain_arginine(self):
+        self.assertTrue(
+            all("R" not in residues for residues in LYSINE_LABELS.values())
+        )
+        self.assertEqual(len(LYSINE_LABELS), 16)  # K, K plus one (5), K plus two (10)
+
+    def test_lysine_only_label_skips_an_arginine_terminated_peptide(self):
+        # Tryptic AAAAR | AAAAK: dropping arginine leaves the first peptide
+        # unquantifiable, and adding leucine does not rescue it either.
+        _, labelled, _ = digest_mask(
+            "AAAARAAAAK",
+            RULES["Trypsin"],
+            LYSINE_STUDY_LABELS,
+            min_length=1,
+            max_length=20,
+            missed_cleavages=0,
+        )
+        self.assertEqual(labelled["K+R"], interval_mask(0, 10))
+        self.assertEqual(labelled["K"], interval_mask(5, 10))
+        self.assertEqual(labelled["K+L"], interval_mask(5, 10))
 
     def test_fasta_parser(self):
         with TemporaryDirectory() as directory:

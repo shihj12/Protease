@@ -1,17 +1,17 @@
 family,combination,enzymes,total_junctions,both_unique,both_unique_zero_missed,intact_only,mature_only,neither,intact_observed_unique,mature_observed_unique,both_detectable,proteins_with_intact,total_proteins,search_specificity
-single,Trypsin,Trypsin,49,0,0,25,0,24,25,0,0,15,30,specific cleavage
-single,Trypsin/Lys-C,Trypsin;Lys-C,49,0,0,27,0,22,27,0,0,16,30,specific cleavage
-single,Chymotrypsin,Chymotrypsin,49,0,0,12,0,37,12,0,0,7,30,specific cleavage
-single,Lys-N,Lys-N,49,0,0,16,0,33,16,0,0,11,30,specific cleavage
-single,Glu-C,Glu-C,49,0,0,12,0,37,12,0,0,6,30,specific cleavage
-single,Asp-N,Asp-N,49,0,0,17,0,32,17,0,0,7,30,specific cleavage
-two,Trypsin/Lys-C + Chymotrypsin,Trypsin;Lys-C;Chymotrypsin,49,0,0,27,0,22,27,0,0,16,30,specific cleavage
-two,Trypsin/Lys-C + Lys-N,Trypsin;Lys-C;Lys-N,49,0,0,28,0,21,28,0,0,17,30,specific cleavage
-two,Trypsin/Lys-C + Glu-C,Trypsin;Lys-C;Glu-C,49,0,0,30,0,19,30,0,0,17,30,specific cleavage
-two,Trypsin/Lys-C + Asp-N,Trypsin;Lys-C;Asp-N,49,0,0,34,0,15,34,0,0,18,30,specific cleavage
-three,Trypsin/Lys-C + Chymotrypsin + Lys-N,Trypsin;Lys-C;Chymotrypsin;Lys-N,49,0,0,28,0,21,28,0,0,17,30,specific cleavage
-three,Trypsin/Lys-C + Chymotrypsin + Glu-C,Trypsin;Lys-C;Chymotrypsin;Glu-C,49,0,0,30,0,19,30,0,0,17,30,specific cleavage
-three,Trypsin/Lys-C + Chymotrypsin + Asp-N,Trypsin;Lys-C;Chymotrypsin;Asp-N,49,0,0,34,0,15,34,0,0,18,30,specific cleavage
-three,Trypsin/Lys-C + Lys-N + Glu-C,Trypsin;Lys-C;Lys-N;Glu-C,49,0,0,31,0,18,31,0,0,18,30,specific cleavage
-three,Trypsin/Lys-C + Lys-N + Asp-N,Trypsin;Lys-C;Lys-N;Asp-N,49,0,0,35,0,14,35,0,0,19,30,specific cleavage
-three,Trypsin/Lys-C + Glu-C + Asp-N,Trypsin;Lys-C;Glu-C;Asp-N,49,0,0,35,0,14,35,0,0,18,30,specific cleavage
+single,Trypsin,Trypsin,56,0,0,30,0,26,30,0,0,16,31,specific cleavage
+single,Trypsin/Lys-C,Trypsin;Lys-C,56,0,0,32,0,24,32,0,0,17,31,specific cleavage
+single,Chymotrypsin,Chymotrypsin,56,0,0,12,0,44,12,0,0,7,31,specific cleavage
+single,Lys-N,Lys-N,56,0,0,21,0,35,21,0,0,12,31,specific cleavage
+single,Glu-C,Glu-C,56,0,0,17,0,39,17,0,0,7,31,specific cleavage
+single,Asp-N,Asp-N,56,0,0,18,0,38,18,0,0,8,31,specific cleavage
+two,Trypsin/Lys-C + Chymotrypsin,Trypsin;Lys-C;Chymotrypsin,56,0,0,32,0,24,32,0,0,17,31,specific cleavage
+two,Trypsin/Lys-C + Lys-N,Trypsin;Lys-C;Lys-N,56,0,0,35,0,21,35,0,0,18,31,specific cleavage
+two,Trypsin/Lys-C + Glu-C,Trypsin;Lys-C;Glu-C,56,0,0,36,0,20,36,0,0,18,31,specific cleavage
+two,Trypsin/Lys-C + Asp-N,Trypsin;Lys-C;Asp-N,56,0,0,40,0,16,40,0,0,19,31,specific cleavage
+three,Trypsin/Lys-C + Chymotrypsin + Lys-N,Trypsin;Lys-C;Chymotrypsin;Lys-N,56,0,0,35,0,21,35,0,0,18,31,specific cleavage
+three,Trypsin/Lys-C + Chymotrypsin + Glu-C,Trypsin;Lys-C;Chymotrypsin;Glu-C,56,0,0,36,0,20,36,0,0,18,31,specific cleavage
+three,Trypsin/Lys-C + Chymotrypsin + Asp-N,Trypsin;Lys-C;Chymotrypsin;Asp-N,56,0,0,40,0,16,40,0,0,19,31,specific cleavage
+three,Trypsin/Lys-C + Lys-N + Glu-C,Trypsin;Lys-C;Lys-N;Glu-C,56,0,0,38,0,18,38,0,0,19,31,specific cleavage
+three,Trypsin/Lys-C + Lys-N + Asp-N,Trypsin;Lys-C;Lys-N;Asp-N,56,0,0,42,0,14,42,0,0,20,31,specific cleavage
+three,Trypsin/Lys-C + Glu-C + Asp-N,Trypsin;Lys-C;Glu-C;Asp-N,56,0,0,42,0,14,42,0,0,19,31,specific cleavage

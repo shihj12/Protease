@@ -29,6 +29,41 @@ class PropeptideQuantificationTests(TestCase):
     def test_pgrn_is_in_presets(self):
         self.assertIn("GRN", PRESETS["Lysosomal hydrolases"])
 
+    def test_prosaposin_is_in_presets(self):
+        self.assertIn("PSAP", PRESETS["Lysosomal hydrolases"])
+
+    def test_saposin_boundaries_come_from_flanking_propeptides(self):
+        """PSAP needs no special case: its saposins are CHAINs between PROPEPs.
+
+        A saposin terminus is only picked up where the neighbouring PROPEP
+        actually abuts it, so the mismatched Saposin-C C-terminus (PROPEP
+        starts two residues later) is deliberately absent.
+        """
+
+        entry = FakeEntry(
+            accession="P07602",
+            gene="PSAP",
+            protein="Prosaposin",
+            sequence="A" * 524,
+            length=524,
+            features=[
+                feature("SIGNAL", 1, 16),
+                feature("PROPEP", 17, 59),
+                feature("CHAIN", 17, 524, "Prosaposin"),
+                feature("CHAIN", 60, 142, "Saposin-A"),
+                feature("PROPEP", 143, 194),
+                feature("CHAIN", 311, 390, "Saposin-C"),
+                feature("PROPEP", 393, 404),
+                feature("CHAIN", 405, 486, "Saposin-D"),
+                feature("PROPEP", 487, 524),
+            ],
+        )
+        observed = [(j.position, j.side) for j in processing_junctions(entry)]
+        self.assertEqual(
+            observed, [(59, "N"), (142, "C"), (404, "N"), (486, "C")]
+        )
+        self.assertNotIn((390, "C"), observed)
+
     def test_pgrn_products_add_internal_boundaries_but_not_signal_boundary(self):
         entry = FakeEntry(
             accession="P28799",

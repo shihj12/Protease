@@ -39,6 +39,13 @@ GRN,P28799,Progranulin,441|442,N,442,496,Granulin-6,granulin,
 GRN,P28799,Progranulin,496|497,C,442,496,Granulin-6,granulin,
 GRN,P28799,Progranulin,517|518,N,518,573,Granulin-7,granulin,
 GRN,P28799,Progranulin,573|574,C,518,573,Granulin-7,granulin,
+PSAP,P07602,Prosaposin,59|60,N,60,142,Saposin-A,propeptide,curator inference
+PSAP,P07602,Prosaposin,142|143,C,60,142,Saposin-A,propeptide,curator inference
+PSAP,P07602,Prosaposin,194|195,N,195,274,Saposin-B-Val,propeptide,curator inference
+PSAP,P07602,Prosaposin,274|275,C,195,274,Saposin-B-Val,propeptide,curator inference
+PSAP,P07602,Prosaposin,310|311,N,311,390,Saposin-C,propeptide,curator inference
+PSAP,P07602,Prosaposin,404|405,N,405,486,Saposin-D,propeptide,curator inference
+PSAP,P07602,Prosaposin,486|487,C,405,486,Saposin-D,propeptide,curator inference
 PSMB1,P20618,Proteasome subunit beta type-1,28|29,N,29,241,Proteasome subunit beta type-1,propeptide,experimental
 PSMB4,P28070,Proteasome subunit beta type-4,45|46,N,46,264,Proteasome subunit beta type-4,propeptide,experimental
 PSMB5,P28074,Proteasome subunit beta type-5,59|60,N,60,263,Proteasome subunit beta type-5,propeptide,experimental

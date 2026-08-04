@@ -20,6 +20,9 @@ from coverage_analysis.propeptide_quantification import load_preset_entries
 from coverage_analysis.protease_coverage import (
     LABELS,
     KR_PLUS_ONE_LABELS,
+    LYSINE_LABELS,
+    LYSINE_PARTNER_RESIDUES,
+    LYSINE_STUDY_LABELS,
     NATURE_ENZYMES,
     nature_designs,
 )
@@ -50,6 +53,22 @@ def _family_designs():
         *[("two", name, enzymes) for name, enzymes in pairs],
         *[("three", name, enzymes) for name, enzymes in triples],
     ]
+
+
+def _best_lysine_pairs(rows, plotted: list[str], count: int = 5) -> list[str]:
+    """The strongest K-plus-two sets, averaged over the plotted designs."""
+
+    pair_labels = [label for label in LYSINE_LABELS if label.count("+") == 2]
+    means = {
+        label: sum(
+            float(row["residue_weighted_pct"])
+            for row in rows
+            if row["label"] == label and row["combination"] in plotted
+        )
+        / len(plotted)
+        for label in pair_labels
+    }
+    return sorted(means, key=lambda label: means[label], reverse=True)[:count]
 
 
 def _rank_reference(rows, designs):
@@ -112,6 +131,49 @@ def run(output_dir: Path, cache_dir: Path) -> None:
         [name for name, _ in silac_designs],
         output_dir / "graph_7_nature_silac_kr_plus_one.png",
         label_order=list(KR_PLUS_ONE_LABELS),
+        highlight_label="K+R+L",
+    )
+
+    print("Calculating Nature-observed coverage without an arginine label")
+    # The two tryptic baselines ride along in the table because dropping
+    # arginine costs a plain tryptic digest the most; the panels stay on the
+    # same six designs as graphs 1 and 7.
+    lysine_designs = [
+        ("Trypsin", ("Trypsin",)),
+        ("Trypsin/Lys-C", ("Trypsin", "Lys-C")),
+        *silac_designs,
+    ]
+    lysine_rows, lysine_provenance = nature_label_coverage(
+        cache_dir, lysine_designs, LYSINE_STUDY_LABELS, print
+    )
+    lysine_baselines = {
+        str(row["combination"]): float(row["residue_weighted_pct"])
+        for row in lysine_rows
+        if row["label"] == "K+R"
+    }
+    for row in lysine_rows:
+        baseline = lysine_baselines[str(row["combination"])]
+        row["kr_baseline_pct"] = baseline
+        row["gain_over_kr_pct"] = float(row["residue_weighted_pct"]) - baseline
+    _write_csv(output_dir / "nature_silac_lysine_coverage.csv", lysine_rows)
+
+    plotted = [name for name, _ in silac_designs]
+    silac_panel_plot(
+        lysine_rows,
+        plotted,
+        output_dir / "graph_8_nature_silac_lysine_plus_one.png",
+        label_order=["K+R", "K", *[f"K+{r}" for r in LYSINE_PARTNER_RESIDUES]],
+        highlight_label="K+R",
+    )
+    silac_panel_plot(
+        lysine_rows,
+        plotted,
+        output_dir / "graph_9_nature_silac_lysine_plus_two.png",
+        label_order=[
+            "K+R",
+            "K+R+L",
+            *_best_lysine_pairs(lysine_rows, plotted),
+        ],
         highlight_label="K+R+L",
     )
 
@@ -184,6 +246,8 @@ def run(output_dir: Path, cache_dir: Path) -> None:
         "coverage_provenance": coverage_provenance,
         "silac_provenance": silac_provenance,
         "kr_plus_one_provenance": kr_plus_one_provenance,
+        "lysine_provenance": lysine_provenance,
+        "lysine_designs": [name for name, _ in lysine_designs],
         "sources": {
             "study": "https://doi.org/10.1038/s41587-023-01714-x",
             "dataset": "https://proteomecentral.proteomexchange.org/cgi/GetDataset?ID=PXD024364",

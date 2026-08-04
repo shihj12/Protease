@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-08-01T06:44:31.491890+00:00",
+  "generated_utc": "2026-08-04T14:57:12.330815+00:00",
   "preset_symbols": [
     "CTSB",
     "CTSC",
@@ -22,6 +22,7 @@
     "HEXA",
     "HEXB",
     "GRN",
+    "PSAP",
     "PSMB1",
     "PSMB4",
     "PSMB5",
@@ -32,9 +33,9 @@
     "PSMB10",
     "PSMB11"
   ],
-  "proteins": 30,
-  "processing_junctions": 49,
-  "conventional_propeptide_junctions": 34,
+  "proteins": 31,
+  "processing_junctions": 56,
+  "conventional_propeptide_junctions": 41,
   "pgrn_granulin_junctions": 15,
   "minimum_peptide_length": 7,
   "maximum_peptide_length": 52,
@@ -45,35 +46,35 @@
   "top_two_group_designs": [
     {
       "combination": "Trypsin/Lys-C + ProAlanase",
-      "both_unique": 49,
-      "both_unique_zero_missed": 39
+      "both_unique": 56,
+      "both_unique_zero_missed": 45
     },
     {
       "combination": "Trypsin/Lys-C + Elastase",
-      "both_unique": 49,
-      "both_unique_zero_missed": 31
+      "both_unique": 56,
+      "both_unique_zero_missed": 36
     },
     {
       "combination": "Trypsin/Lys-C + Chymotrypsin",
-      "both_unique": 48,
-      "both_unique_zero_missed": 41
+      "both_unique": 55,
+      "both_unique_zero_missed": 46
     }
   ],
   "top_three_group_designs": [
     {
       "combination": "Trypsin/Lys-C + Chymotrypsin + Glu-C",
-      "both_unique": 49,
-      "both_unique_zero_missed": 48
+      "both_unique": 56,
+      "both_unique_zero_missed": 53
     },
     {
       "combination": "Trypsin/Lys-C + Glu-C + Pepsin",
-      "both_unique": 49,
-      "both_unique_zero_missed": 48
+      "both_unique": 56,
+      "both_unique_zero_missed": 53
     },
     {
-      "combination": "Trypsin/Lys-C + Chymotrypsin + Asp-N",
-      "both_unique": 49,
-      "both_unique_zero_missed": 46
+      "combination": "Trypsin/Lys-C + Glu-C + ProAlanase",
+      "both_unique": 56,
+      "both_unique_zero_missed": 52
     }
   ],
   "pgrn_source": "https://www.uniprot.org/uniprotkb/P28799/entry"

@@ -14,11 +14,34 @@ matplotlib.rcParams["svg.hashsalt"] = "protease-coverage"
 
 
 TEXT = "#102a43"
+
+# One-hue ramp for combination_plot, where the segments are ordered stages of
+# the same outcome (0 missed -> rescued by missed cleavages -> not joint).
 COLORS = {
     "both_unique": "#2f6f8f",
     "intact_only": "#7aa6b8",
     "mature_only": "#c5d5dc",
     "neither": "#e8ecef",
+}
+
+# outcome_plot stacks four distinct states, not stages, so intact-only and
+# mature-only take their own hues rather than lighter steps of the "Both" blue.
+# Checked against the white figure surface: worst all-pairs CVD deltaE 10.3
+# under protanopia, worst normal-vision deltaE 16.7, every fill at or above
+# 3:1. "Neither" stays a near-surface neutral because it encodes absence.
+OUTCOME_COLORS = {
+    "both_unique": "#2f6f8f",
+    "intact_only": "#eb6834",
+    "mature_only": "#00a27d",
+    "neither": "#e8ecef",
+}
+
+# In-bar counts take whichever ink clears 4.5:1 against their own fill.
+OUTCOME_INK = {
+    "both_unique": "#ffffff",
+    "intact_only": TEXT,
+    "mature_only": TEXT,
+    "neither": TEXT,
 }
 
 
@@ -52,7 +75,12 @@ def outcome_plot(rows: list[dict[str, object]], destination: Path) -> None:
     for key, name in zip(keys, names):
         values = [int(row[key]) for row in rows][::-1]
         bars = axis.barh(
-            labels, values, left=left, height=0.64, color=COLORS[key], label=name
+            labels,
+            values,
+            left=left,
+            height=0.64,
+            color=OUTCOME_COLORS[key],
+            label=name,
         )
         for bar, value in zip(bars, values):
             if value:
@@ -63,7 +91,7 @@ def outcome_plot(rows: list[dict[str, object]], destination: Path) -> None:
                     ha="center",
                     va="center",
                     fontsize=7.5,
-                    color=TEXT,
+                    color=OUTCOME_INK[key],
                 )
         left = [previous + value for previous, value in zip(left, values)]
     _minimal(axis)

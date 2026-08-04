@@ -51,14 +51,21 @@ high-confidence experimental prediction.
 
 ## Precursor / mature-state paired quantification
 
-The preset-target analysis, including PGRN (`GRN`), is generated separately:
+The preset-target analysis, including PGRN (`GRN`) and prosaposin (`PSAP`), is
+generated separately:
 
 ```powershell
 python -m coverage_analysis.run_propeptide_analysis
 ```
 
-It evaluates 34 conventional UniProt pro-peptide boundaries and 15 internal
-PGRN/granulin-product boundaries. A junction counts as jointly quantifiable only
+It evaluates 41 conventional UniProt pro-peptide boundaries and 15 internal
+PGRN/granulin-product boundaries across 31 proteins. Seven of the conventional
+boundaries are prosaposin's: its saposins are `CHAIN` features separated by
+annotated `PROPEP` linkers, so they are found by the ordinary rule and need no
+special case. Two saposin termini are absent because UniProt's neighbouring
+`PROPEP` does not abut the chain — Saposin-B at 273|274 (only the Saposin-B-Val
+form at 274|275 is flanked) and Saposin-C at 390|391.
+A junction counts as jointly quantifiable only
 when the parallel aliquots provide both a human-proteome-unique peptide spanning
 the intact precursor junction and a unique mature neo-terminal peptide. I/L are
 collapsed for uniqueness. An analytical enzyme cut at the biological junction
@@ -89,6 +96,15 @@ Nature-reference figure 7 repeats those designs for K+R plus each additional
 label. Its plotted values and source table are stored beside the other Nature
 outputs.
 
+Figures 8 and 9 drop arginine from the labelling scheme entirely, which is what
+a design avoiding Arg-to-Pro conversion has to live with. Figure 8 shows lysine
+alone and lysine plus one of L, T, I, V or H against the K+R incumbent; figure 9
+shows lysine plus the two strongest partner residues, against K+R and K+R+L.
+`nature_silac_lysine_coverage.csv` carries every set, including the ones the
+figures do not plot, with each value's shortfall against that design's K+R
+baseline in `gain_over_kr_pct`. It also adds plain `Trypsin` and `Trypsin/Lys-C`
+rows, because a tryptic digest is where losing the arginine label hurts most.
+
 The pro-peptide figures match the exact theoretical candidate sequences to the
 Nature `peptides.txt` table, retaining the experiment/enzyme assignment. The
 study used a specific-cleavage MaxQuant search. It can therefore support
@@ -108,3 +124,4 @@ empirically requires a semi-specific/unspecific re-search or N-terminomics.
 - ProAlanase specificity: <https://www.promega.com/products/mass-spectrometry/proteases-and-surfactants/proalanase-mass-spec-grade/>
 - Proteome Discoverer elastase rule: <https://docs.thermofisher.com/r/Proteome-Discoverer-3.1-User-Guide/en-US1324471691v1>
 - Human progranulin (P28799): <https://www.uniprot.org/uniprotkb/P28799/entry>
+- Human prosaposin (P07602): <https://www.uniprot.org/uniprotkb/P07602/entry>

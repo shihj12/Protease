@@ -30,6 +30,7 @@ LYSOSOMAL_HYDROLASES = [
     "HEXA",   # Beta-hexosaminidase subunit alpha
     "HEXB",   # Beta-hexosaminidase subunit beta
     "GRN",    # Progranulin (PGRN; precursor of granulin peptides)
+    "PSAP",   # Prosaposin (precursor of saposins A-D)
 ]
 
 # 20S proteasome catalytic and structural beta subunits made with propeptides

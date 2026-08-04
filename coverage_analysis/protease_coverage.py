@@ -33,6 +33,40 @@ KR_PLUS_ONE_LABELS: dict[str, frozenset[str]] = {
     for residue in ("L", "T", "I", "V", "H")
 }
 
+# Arginine is the SILAC label that misbehaves metabolically (Arg-to-Pro
+# conversion), so these sets ask what a lysine-anchored scheme recovers with
+# arginine dropped entirely. Every set is a union at the peptide level: a
+# peptide counts when it carries at least one of the listed residues.
+LYSINE_PARTNER_RESIDUES = ("L", "T", "I", "V", "H")
+
+LYSINE_LABELS: dict[str, frozenset[str]] = {
+    "K": frozenset("K"),
+    **{
+        f"K+{residue}": frozenset(f"K{residue}")
+        for residue in LYSINE_PARTNER_RESIDUES
+    },
+    **{
+        f"K+{first}+{second}": frozenset(f"K{first}{second}")
+        for first, second in combinations(LYSINE_PARTNER_RESIDUES, 2)
+    },
+}
+
+# Carried through the same pass so every arginine-free figure can show what was
+# given up: the incumbent K+R and the best K+R-plus-one scheme.
+ARGININE_REFERENCE_LABELS: dict[str, frozenset[str]] = {
+    "R": frozenset("R"),
+    "K+R": frozenset("KR"),
+    "K+R+L": frozenset("KRL"),
+}
+
+# One pass covers the arginine-free sets, the single residues, and the
+# arginine references, so the cached label matrix answers all of them.
+LYSINE_STUDY_LABELS: dict[str, frozenset[str]] = {
+    **LABELS,
+    **ARGININE_REFERENCE_LABELS,
+    **LYSINE_LABELS,
+}
+
 NATURE_ENZYMES = (
     "Trypsin",
     "Lys-C",
